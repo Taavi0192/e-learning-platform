@@ -1,19 +1,22 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/logo.png";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { motion } from "framer-motion";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
+    role: "student", // Default role is student
     password: "",
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
   const [currentStep, setCurrentStep] = useState(1); // Track form steps
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,6 +69,14 @@ const Signup = () => {
     alert("Account created successfully! This is a demo version without backend connection.");
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+  
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   const steps = [
     {
       title: "Basic Information",
@@ -100,6 +111,40 @@ const Signup = () => {
               <p className="text-red-500 text-sm mt-1">{errors.email}</p>
             )}
           </div>
+          {/* Role Selection */}
+          <div className="pt-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Sign up as</label>
+            <div className="flex space-x-4">
+              <div className="flex items-center">
+                <input
+                  id="role-student"
+                  name="role"
+                  type="radio"
+                  value="student"
+                  checked={formData.role === "student"}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-[#19a4db] focus:ring-[#19a4db] border-gray-300"
+                />
+                <label htmlFor="role-student" className="ml-2 block text-sm text-gray-700">
+                  Student
+                </label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  id="role-teacher"
+                  name="role"
+                  type="radio"
+                  value="teacher"
+                  checked={formData.role === "teacher"}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-[#19a4db] focus:ring-[#19a4db] border-gray-300"
+                />
+                <label htmlFor="role-teacher" className="ml-2 block text-sm text-gray-700">
+                  Teacher
+                </label>
+              </div>
+            </div>
+          </div>
         </>
       ),
     },
@@ -124,7 +169,7 @@ const Signup = () => {
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={togglePasswordVisibility}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
               >
                 {showPassword ? <FiEyeOff /> : <FiEye />}
