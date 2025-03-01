@@ -5,7 +5,7 @@ import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 
-const Signup = () => {
+const SignUp = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -307,4 +307,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default SignUp;

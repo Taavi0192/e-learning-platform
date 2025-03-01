@@ -1,9 +1,9 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
-  FiHome, FiBook, FiCalendar, FiUsers, FiPieChart, 
+  FiHome, FiBook, FiCalendar, FiUsers, 
   FiAward, FiSettings, FiLogOut, FiMessageSquare, FiClipboard,
-  FiShield
+  
 } from "react-icons/fi";
 
 const Sidebar = ({ isSidebarOpen, navigate }) => {
@@ -103,26 +103,6 @@ const Sidebar = ({ isSidebarOpen, navigate }) => {
           </Link>
           
           <Link
-            to="/dashboard/users"
-            className={`flex items-center px-4 py-3 text-sm rounded-lg ${
-              isActive('/users') ? 'bg-[#19a4db] text-white' : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            <FiShield className="mr-3 h-5 w-5" />
-            User Access Control
-          </Link>
-          
-          <Link
-            to="/dashboard/reports"
-            className={`flex items-center px-4 py-3 text-sm rounded-lg ${
-              isActive('/reports') ? 'bg-[#19a4db] text-white' : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            <FiPieChart className="mr-3 h-5 w-5" />
-            Reports & Analytics
-          </Link>
-          
-          <Link
             to="/dashboard/settings"
             className={`flex items-center px-4 py-3 text-sm rounded-lg ${
               isActive('/settings') ? 'bg-[#19a4db] text-white' : 'text-gray-700 hover:bg-gray-100'
@@ -137,7 +117,7 @@ const Sidebar = ({ isSidebarOpen, navigate }) => {
               onClick={() => navigate('/login')}
               className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
             >
-              <FiLogOut className="mr-3 h-5 w-5" />
+              <FiLogOut className="mr-3 h-10 w-5" />
               Sign Out
             </button>
           </div>

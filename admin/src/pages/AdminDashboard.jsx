@@ -15,8 +15,6 @@ import Teachers from "./dashboard/Teachers";
 import Communications from "./dashboard/Communications";
 import Attendance from "./dashboard/Attendance";
 import Certifications from "./dashboard/Certifications";
-import UserManagement from "./dashboard/UserManagement";
-import Reports from "./dashboard/Reports";
 import Settings from "./dashboard/Settings";
 
 const AdminDashboard = () => {
@@ -60,8 +58,6 @@ const AdminDashboard = () => {
               <Route path="/communications" element={<Communications />} />
               <Route path="/attendance" element={<Attendance />} />
               <Route path="/certifications" element={<Certifications />} />
-              <Route path="/users" element={<UserManagement />} />
-              <Route path="/reports" element={<Reports />} />
               <Route path="/settings" element={<Settings />} />
             </Routes>
           </div>
