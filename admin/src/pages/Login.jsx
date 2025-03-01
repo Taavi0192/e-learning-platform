@@ -102,7 +102,7 @@ const Login = () => {
             </button>
           </form>
           <p className="text-center text-gray-500 text-sm mt-8">
-            Protected access to EduLearn administration portal. Subject to 
+            Protected access to VMTA administration portal. Subject to 
             <a href="#" className="text-[#19a4db] hover:text-[#6dc9f1] transition-colors duration-200"> Privacy Policy</a> and 
             <a href="#" className="text-[#19a4db] hover:text-[#6dc9f1] transition-colors duration-200"> Terms of Service</a>
           </p>
