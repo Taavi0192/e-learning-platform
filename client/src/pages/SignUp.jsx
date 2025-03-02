@@ -53,7 +53,7 @@ const SignUp = () => {
 
     try {
       await signUp(formData);
-      toast.success("Account created successfully!");
+      toast.success("Account created successfully! Waiting for approval...");
       navigate("/login");
     } catch (error) {
       toast.error(error.message || "Sign up failed. Please try again.");
