@@ -96,8 +96,10 @@ export const AuthProvider = ({ children }) => {
       setAccessToken(null);
       setUser(null);
       setRole(null);
+      setUserName(null);
       localStorage.removeItem("user");
       localStorage.removeItem("role");
+      localStorage.removeItem("userName");
 
       await api.post(`/logout`);
       navigate("/login");
