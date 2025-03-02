@@ -6,21 +6,32 @@ import { useNavigate } from "react-router-dom";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [accessToken, setAccessToken] = useState(null);
-  const [userName, setUserName] = useState(null);
   const navigate = useNavigate();
+
+  // Load initial state from localStorage
+  const [accessToken, setAccessToken] = useState(
+    () => localStorage.getItem("accessToken") || null
+  );
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
   const [role, setRole] = useState(() => localStorage.getItem("role") || null);
+  const [userName, setUserName] = useState(
+    () => localStorage.getItem("userName") || null
+  );
   const [loading, setLoading] = useState(true);
 
   // Function to get the base URL based on the role
   const getBaseURL = (role) => {
-    if (role === "student") return "http://localhost:5000/api/studentRoute";
-    if (role === "teacher") return "http://localhost:5000/api/teacherRoutes";
-    return "http://localhost:5000/api";
+    switch (role) {
+      case "student":
+        return "http://localhost:5000/api/studentRoute";
+      case "teacher":
+        return "http://localhost:5000/api/teacherRoutes";
+      default:
+        return "http://localhost:5000/api";
+    }
   };
 
   // Function to get API instance dynamically
@@ -33,8 +44,7 @@ export const AuthProvider = ({ children }) => {
   // Function to decode JWT token
   const decodeToken = (token) => {
     try {
-      const decoded = jwtDecode(token);
-      return { id: decoded.id, email: decoded.email, role: decoded.role };
+      return jwtDecode(token);
     } catch (error) {
       console.error("Error decoding token:", error);
       return null;
@@ -44,7 +54,7 @@ export const AuthProvider = ({ children }) => {
   // Sign-up function
   const signUp = async ({ username, email, password, role }) => {
     try {
-      const api = getApiInstance(role); // Get API instance based on provided role
+      const api = getApiInstance(role);
       const res = await api.post(`/signup`, {
         username,
         email,
@@ -59,47 +69,42 @@ export const AuthProvider = ({ children }) => {
 
   // Login function
   const login = async ({ email, password, role }) => {
-    console.log(email, password, role);
     try {
-      const api = getApiInstance(role); // Get API instance based on role
+      const api = getApiInstance(role);
       const res = await api.post(`/login`, { email, password });
 
       const token = res.data.accessToken;
-      const userName = res.data.student.username;
-      setUserName(userName);
+      const userData = res.data[role]; // Dynamically get user info
+
       setAccessToken(token);
+      setUserName(userData.username);
+      setUser(decodeToken(token));
+      setRole(role);
 
-      const decodedUser = decodeToken(token);
-
-      if (decodedUser) {
-        setUser(decodedUser);
-        setRole(decodedUser.role); // Ensure role is set immediately
-
-        localStorage.setItem("user", JSON.stringify(decodedUser));
-        localStorage.setItem("role", decodedUser.role);
-        localStorage.setItem("userName", userName);
-      }
+      // Store in localStorage
+      localStorage.setItem("accessToken", token);
+      localStorage.setItem("user", JSON.stringify(decodeToken(token)));
+      localStorage.setItem("role", role);
+      localStorage.setItem("userName", userData.username);
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Invalid credentials");
+      throw new Error(error.response?.data?.message || "Error logging in");
     }
   };
 
   // Logout function
   const logout = async () => {
     try {
-      const userRole = localStorage.getItem("role"); // Fallback to stored role
+      const userRole = localStorage.getItem("role");
       if (!userRole) throw new Error("No role found for logout");
 
       const api = getApiInstance(userRole);
 
-      // Clear state and storage before making the request
+      // Clear state and storage
       setAccessToken(null);
       setUser(null);
       setRole(null);
       setUserName(null);
-      localStorage.removeItem("user");
-      localStorage.removeItem("role");
-      localStorage.removeItem("userName");
+      localStorage.clear();
 
       await api.post(`/logout`);
       navigate("/login");
@@ -108,9 +113,6 @@ export const AuthProvider = ({ children }) => {
         "Logout error:",
         error.response?.data?.message || error.message
       );
-    } finally {
-      // Reload the page to reset everything after logout
-      window.location.reload();
     }
   };
 
@@ -127,6 +129,7 @@ export const AuthProvider = ({ children }) => {
 
       const decodedUser = decodeToken(token);
       setUser(decodedUser);
+      localStorage.setItem("accessToken", token);
       localStorage.setItem("user", JSON.stringify(decodedUser));
 
       return token;
@@ -136,11 +139,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Set up API interceptors only when `role` is available
+  // Set up API interceptors
   useEffect(() => {
-    if (!role) return; // Ensure role is set before creating the interceptor
+    if (!role) return;
 
-    const api = getApiInstance(role); // Get the API instance dynamically
+    const api = getApiInstance(role);
 
     const interceptor = api.interceptors.response.use(
       (response) => response,
@@ -166,24 +169,23 @@ export const AuthProvider = ({ children }) => {
     return () => api.interceptors.response.eject(interceptor);
   }, [role]);
 
-  // Fetch access token on mount
+  // Restore authentication state on page reload
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
+    const storedToken = localStorage.getItem("accessToken");
+    const storedUser = localStorage.getItem("user");
+
+    if (storedToken && storedUser) {
+      setAccessToken(storedToken);
+      setUser(JSON.parse(storedUser));
+      setRole(localStorage.getItem("role") || null);
+      setUserName(localStorage.getItem("userName") || null);
     }
 
-    const fetchToken = async () => {
-      await refreshAccessToken();
-      setLoading(false);
-    };
-    fetchToken();
+    setLoading(false);
   }, []);
 
   // Helper function to check if the user is authenticated
-  const isAuthenticated = () => {
-    return !!accessToken && !!user;
-  };
+  const isAuthenticated = () => !!accessToken && !!user;
 
   return (
     <AuthContext.Provider
@@ -196,8 +198,8 @@ export const AuthProvider = ({ children }) => {
         signUp,
         logout,
         loading,
-        isAuthenticated, // Add this helper function
-        api: getApiInstance(role), // Always use a fresh API instance
+        isAuthenticated,
+        api: getApiInstance(role),
       }}
     >
       {children}
@@ -206,8 +208,6 @@ export const AuthProvider = ({ children }) => {
 };
 
 // Custom hook to use AuthContext
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
 
 export default AuthContext;

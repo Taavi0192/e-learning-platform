@@ -174,7 +174,7 @@ const Sidebar = ({ isSidebarOpen, navigate }) => {
               onClick={handleLogout} // Handle logout on click
               className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
             >
-              <FiLogOut className="mr-3 h-5 w-5" />
+              <FiLogOut className="mr-3 h-10 w-5" />
               Sign Out
             </button>
           </div>

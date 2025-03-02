@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom"; // Remove `Router` import
 import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import "react-toastify/dist/ReactToastify.css"; // Import toast CSS
 import Login from "./pages/Login";
 import Signup from "./pages/SignUp";
 import StudentDashboard from "./pages/StudentDashboard";
@@ -13,7 +13,6 @@ function App() {
   return (
     <>
       <Routes>
-        {/* Redirect root path to login page */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />

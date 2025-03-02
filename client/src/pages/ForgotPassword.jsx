@@ -2,10 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowLeft } from "react-icons/fi";
 import Logo from "../assets/logo.png";
+import { toast } from "react-toastify"; // Import toast
+import "react-toastify/dist/ReactToastify.css"; // Import toast CSS
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [password, setPassword] = useState("");
@@ -18,7 +20,6 @@ const ForgotPassword = () => {
 
   const inputRefs = useRef([]);
 
-  // Set up countdown timer after OTP is sent
   useEffect(() => {
     let timer;
     if (step === 2 && countdown > 0) {
@@ -32,21 +33,45 @@ const ForgotPassword = () => {
     return () => clearTimeout(timer);
   }, [step, countdown]);
 
-  // Define the startCountdown function
   const startCountdown = () => {
-    setCountdown(30); // Reset countdown to 30 seconds
-    setResendDisabled(true); // Disable the resend button
+    setCountdown(30);
+    setResendDisabled(true);
+  };
+
+  const handleOtpChange = (e, index) => {
+    const value = e.target.value;
+    if (value && !/^\d*$/.test(value)) return;
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+    if (value && index < 5) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1].focus();
+    }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     if (!email) {
       setError("Please enter your email address");
+      toast.error("Please enter your email address!");
       return;
     }
 
     try {
-      // Call the forgot-password API
       const response = await fetch(
         "http://localhost:5000/api/resetpassword/forgot-password",
         {
@@ -64,18 +89,18 @@ const ForgotPassword = () => {
         throw new Error(data.message || "Failed to send OTP");
       }
 
-      // Move to the OTP step
       setError("");
       setStep(2);
-      startCountdown(); // Start the countdown
+      startCountdown();
+      toast.success("OTP sent to your email!");
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Failed to send OTP!");
     }
   };
 
   const handleResendOTP = async () => {
     try {
-      // Call the forgot-password API to resend OTP
       const response = await fetch(
         "http://localhost:5000/api/resetpassword/forgot-password",
         {
@@ -93,40 +118,16 @@ const ForgotPassword = () => {
         throw new Error(data.message || "Failed to resend OTP");
       }
 
-      // Reset OTP fields and start countdown
       setOtp(["", "", "", "", "", ""]);
-      startCountdown(); // Restart the countdown
+      startCountdown();
+      toast.success("OTP resent successfully!");
 
-      // Focus on the first input
       if (inputRefs.current[0]) {
         inputRefs.current[0].focus();
       }
     } catch (err) {
       setError(err.message);
-    }
-  };
-
-  const handleOtpChange = (e, index) => {
-    const value = e.target.value;
-
-    // Only allow one digit
-    if (value && !/^\d*$/.test(value)) return;
-
-    // Update the OTP array
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // If a digit was entered and we're not at the last input, move to next input
-    if (value && index < 5) {
-      inputRefs.current[index + 1].focus();
-    }
-  };
-
-  const handleKeyDown = (e, index) => {
-    // If backspace is pressed and current field is empty, move to previous field
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1].focus();
+      toast.error(err.message || "Failed to resend OTP!");
     }
   };
 
@@ -136,11 +137,11 @@ const ForgotPassword = () => {
     const otpValue = otp.join("");
     if (otpValue.length !== 6) {
       setError("Please enter the complete OTP");
+      toast.error("Please enter the complete OTP!");
       return;
     }
 
     try {
-      // Call the verify-otp API
       const response = await fetch(
         "http://localhost:5000/api/resetpassword/verify-otp",
         {
@@ -158,11 +159,12 @@ const ForgotPassword = () => {
         throw new Error(data.message || "OTP verification failed");
       }
 
-      // Move to the new password step
       setError("");
       setStep(3);
+      toast.success("OTP verified successfully!");
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "OTP verification failed!");
     }
   };
 
@@ -171,16 +173,17 @@ const ForgotPassword = () => {
 
     if (!password) {
       setError("Please enter your new password");
+      toast.error("Please enter your new password!");
       return;
     }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      toast.error("Passwords do not match!");
       return;
     }
 
     try {
-      // Call the reset-password API
       const response = await fetch(
         "http://localhost:5000/api/resetpassword/reset-password",
         {
@@ -198,19 +201,12 @@ const ForgotPassword = () => {
         throw new Error(data.message || "Failed to reset password");
       }
 
-      // Navigate back to the login page with a success message
+      toast.success("Password reset successful!");
       navigate("/login", { state: { passwordReset: true } });
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Failed to reset password!");
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
   };
 
   return (

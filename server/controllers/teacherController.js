@@ -53,6 +53,8 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log(email, password); 
+
     const teacher = await Teacher.findOne({ email });
 
     if (!teacher) {
@@ -79,7 +81,7 @@ export const login = async (req, res) => {
       sameSite: "Strict",
     });
 
-    return res.json({ message: "Login successful", accessToken });
+    return res.json({ message: "Login successful", accessToken , teacher });
   } catch (error) {
     return res
       .status(500)
