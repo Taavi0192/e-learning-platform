@@ -4,9 +4,11 @@ import Logo from "../assets/logo.png";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
+import { useAuth } from "../context/AuthContext";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { signUp } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -20,14 +22,15 @@ const SignUp = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    // Clear the error for this field when user types
-    setErrors(prev => ({ ...prev, [name]: '' }));
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.username) newErrors.username = "Username is required";
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
@@ -39,19 +42,22 @@ const SignUp = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
-    // This would connect to the backend in a real app
-    alert("Account created successfully! This is a demo version without backend connection.");
-    
-    // Redirect based on role
-    if (formData.role === "teacher") {
-      navigate("/teacher-dashboard");
-    } else {
-      navigate("/student-dashboard");
+
+    try {
+      console.log("Signing up...");
+      await signUp(formData);
+      console.log("after Signing up...");
+      console.log(formData);
+      alert("Sign up successful!");
+      navigate("/login"); // Navigate after successful sign-up
+    } catch (error) {
+      setErrors({
+        general: error.message || "Sign up failed. Please try again.",
+      });
     }
   };
 
@@ -65,7 +71,7 @@ const SignUp = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  
+
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
@@ -80,17 +86,19 @@ const SignUp = () => {
             <div className="absolute -left-20 -top-20 w-56 h-56 rounded-full bg-white/10"></div>
             <div className="absolute -right-32 top-1/3 w-80 h-80 rounded-full bg-white/10"></div>
             <div className="absolute left-20 bottom-20 w-40 h-40 rounded-full bg-white/10"></div>
-            
+
             {/* Logo */}
             <div className="relative z-10 mb-16">
               <img src={Logo} alt="VMTA" className="h-16" />
             </div>
-            
+
             {/* Content */}
             <div className="relative z-10">
               <h1 className="text-4xl font-bold mb-2">Create Account</h1>
-              <p className="text-white/90 mb-16">Join our learning community and start your educational journey</p>
-              
+              <p className="text-white/90 mb-16">
+                Join our learning community and start your educational journey
+              </p>
+
               {/* Basic Information Step */}
               <div className="flex items-center mb-8">
                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#19a4db] font-semibold text-lg">
@@ -98,10 +106,12 @@ const SignUp = () => {
                 </div>
                 <div className="ml-4">
                   <h3 className="font-medium text-lg">Basic Information</h3>
-                  <p className="text-white/80">Let's start with your basic details</p>
+                  <p className="text-white/80">
+                    Let's start with your basic details
+                  </p>
                 </div>
               </div>
-              
+
               {/* Security Step */}
               <div className="flex items-center mb-16">
                 <div className="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center text-white font-semibold text-lg">
@@ -112,7 +122,7 @@ const SignUp = () => {
                   <p className="text-white/80">Create a secure password</p>
                 </div>
               </div>
-              
+
               {/* Features Grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white/10 rounded-xl p-4">
@@ -138,10 +148,14 @@ const SignUp = () => {
           {/* Right Section - Form */}
           <div className="flex flex-col pt-16 px-4 overflow-y-auto">
             <div className="max-w-lg mx-auto w-full">
-              <h2 className="text-2xl font-bold text-gray-800 mb-1">Basic Information</h2>
-              <p className="text-gray-600 mb-8">Let's start with your basic details</p>
+              <h2 className="text-2xl font-bold text-gray-800 mb-1">
+                Basic Information
+              </h2>
+              <p className="text-gray-600 mb-8">
+                Let's start with your basic details
+              </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 {/* Google Sign Up Button */}
                 <button
                   type="button"
@@ -155,7 +169,9 @@ const SignUp = () => {
                 {/* Divider */}
                 <div className="relative flex items-center">
                   <div className="flex-grow border-t border-gray-300"></div>
-                  <span className="flex-shrink mx-4 text-gray-500 text-sm">or</span>
+                  <span className="flex-shrink mx-4 text-gray-500 text-sm">
+                    or
+                  </span>
                   <div className="flex-grow border-t border-gray-300"></div>
                 </div>
 
@@ -172,7 +188,11 @@ const SignUp = () => {
                       className="w-full py-3 pl-12 pr-4 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#19a4db]"
                     />
                   </div>
-                  {errors.username && <p className="mt-1 text-red-500 text-sm">{errors.username}</p>}
+                  {errors.username && (
+                    <p className="mt-1 text-red-500 text-sm">
+                      {errors.username}
+                    </p>
+                  )}
                 </div>
 
                 {/* Email Input */}
@@ -188,9 +208,11 @@ const SignUp = () => {
                       className="w-full py-3 pl-12 pr-4 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#19a4db]"
                     />
                   </div>
-                  {errors.email && <p className="mt-1 text-red-500 text-sm">{errors.email}</p>}
+                  {errors.email && (
+                    <p className="mt-1 text-red-500 text-sm">{errors.email}</p>
+                  )}
                 </div>
-                
+
                 {/* Role Selection */}
                 <div>
                   <p className="text-gray-700 mb-2">Sign up as</p>
@@ -205,7 +227,10 @@ const SignUp = () => {
                         onChange={handleChange}
                         className="h-4 w-4 text-[#19a4db] focus:ring-[#19a4db] border-gray-300"
                       />
-                      <label htmlFor="role-student" className="ml-2 text-gray-700">
+                      <label
+                        htmlFor="role-student"
+                        className="ml-2 text-gray-700"
+                      >
                         Student
                       </label>
                     </div>
@@ -219,7 +244,10 @@ const SignUp = () => {
                         onChange={handleChange}
                         className="h-4 w-4 text-[#19a4db] focus:ring-[#19a4db] border-gray-300"
                       />
-                      <label htmlFor="role-teacher" className="ml-2 text-gray-700">
+                      <label
+                        htmlFor="role-teacher"
+                        className="ml-2 text-gray-700"
+                      >
                         Teacher
                       </label>
                     </div>
@@ -243,10 +271,18 @@ const SignUp = () => {
                       onClick={togglePasswordVisibility}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                     >
-                      {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+                      {showPassword ? (
+                        <FiEyeOff className="h-5 w-5" />
+                      ) : (
+                        <FiEye className="h-5 w-5" />
+                      )}
                     </button>
                   </div>
-                  {errors.password && <p className="mt-1 text-red-500 text-sm">{errors.password}</p>}
+                  {errors.password && (
+                    <p className="mt-1 text-red-500 text-sm">
+                      {errors.password}
+                    </p>
+                  )}
                 </div>
 
                 {/* Confirm Password Input */}
@@ -266,28 +302,38 @@ const SignUp = () => {
                       onClick={toggleConfirmPasswordVisibility}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                     >
-                      {showConfirmPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+                      {showConfirmPassword ? (
+                        <FiEyeOff className="h-5 w-5" />
+                      ) : (
+                        <FiEye className="h-5 w-5" />
+                      )}
                     </button>
                   </div>
-                  {errors.confirmPassword && <p className="mt-1 text-red-500 text-sm">{errors.confirmPassword}</p>}
+                  {errors.confirmPassword && (
+                    <p className="mt-1 text-red-500 text-sm">
+                      {errors.confirmPassword}
+                    </p>
+                  )}
                 </div>
-                
+
                 {/* Tips Box */}
                 <div className="bg-blue-50 p-4 rounded-lg mt-2">
                   <h4 className="font-medium text-gray-800 mb-1">Tips:</h4>
                   <p className="text-blue-700 text-sm">
-                    Choose a username that will be visible to your teachers and classmates
+                    Choose a username that will be visible to your teachers and
+                    classmates
                   </p>
                 </div>
 
                 {/* Create Account Button */}
                 <button
                   type="submit"
+                  onSubmit={handleSubmit}
                   className="w-full py-3 mt-4 bg-[#19a4db] text-white rounded-lg hover:bg-[#1483b0] transition-colors"
                 >
                   Create Account
                 </button>
-                
+
                 {/* Login link */}
                 <div className="text-center text-sm text-gray-600 mt-4">
                   Already have an account?{" "}
@@ -295,7 +341,7 @@ const SignUp = () => {
                     Login
                   </Link>
                 </div>
-                
+
                 {/* Spacer div to ensure bottom margin appears */}
                 <div className="h-10"></div>
               </form>
