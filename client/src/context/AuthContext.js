@@ -1,12 +1,13 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
+  const navigate = useNavigate();
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
@@ -96,16 +97,13 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem("role");
 
       await api.post(`/logout`);
-      Navigate("/login");
+      navigate("/login");
     } catch (error) {
       console.error(
         "Logout error:",
         error.response?.data?.message || error.message
       );
-    } finally {
-      // Reload the page to reset everything after logout
-      window.location.reload();
-    }
+    } 
   };
 
   // Refresh access token

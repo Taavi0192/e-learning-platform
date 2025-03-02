@@ -5,6 +5,8 @@ import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { useAuth } from "../context/AuthContext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -12,7 +14,7 @@ const SignUp = () => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    role: "student", // Default role is student
+    role: "student",
     password: "",
     confirmPassword: "",
   });
@@ -30,7 +32,6 @@ const SignUp = () => {
 
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.username) newErrors.username = "Username is required";
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
@@ -45,26 +46,23 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      toast.error("Please fill all required fields correctly");
+      return;
+    }
 
     try {
-      console.log("Signing up...");
       await signUp(formData);
-      console.log("after Signing up...");
-      console.log(formData);
-      alert("Sign up successful!");
-      navigate("/login"); // Navigate after successful sign-up
+      toast.success("Account created successfully!");
+      navigate("/login");
     } catch (error) {
-      setErrors({
-        general: error.message || "Sign up failed. Please try again.",
-      });
+      toast.error(error.message || "Sign up failed. Please try again.");
     }
   };
 
   const handleGoogleSignup = () => {
-    // In a real app, this would redirect to Google OAuth
+    toast.info("Redirecting to Google sign up...");
     console.log("Signing up with Google...");
-    // For demo purposes, let's just navigate to student dashboard
     navigate("/student-dashboard");
   };
 

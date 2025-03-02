@@ -1,13 +1,15 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext"; // Import AuthContext
+import { AuthContext } from "../context/AuthContext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Logo from "../assets/logo.png";
 import { FiUser, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); // Use login function from AuthContext
+  const { login } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -25,7 +27,6 @@ const Login = () => {
       [name]: type === "checkbox" ? checked : value,
     });
 
-    // Clear error when user types
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" });
     }
@@ -43,20 +44,21 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
 
     setLoading(true);
     try {
-      console.log(formData.email, formData.password, formData.role);
-      const response = await login({
+      await login({
         email: formData.email,
         password: formData.password,
         role: formData.role,
       });
-      console.log(formData.email, formData.password, formData.role);
-      console.log("Login successful:", response);
 
-      // Navigate based on role
+      toast.success("Login successful!");
+      
       if (formData.role === "teacher") {
         navigate("/teacher-dashboard");
       } else {
@@ -64,13 +66,14 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login failed:", error);
-      setErrors({ general: error.message || "Invalid credentials" });
+      toast.error(error.message || "Invalid credentials");
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLogin = () => {
+    toast.info("Redirecting to Google login...");
     console.log("Logging in with Google...");
     navigate("/student-dashboard");
   };
