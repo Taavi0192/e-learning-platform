@@ -1,8 +1,12 @@
 import mongoose from "mongoose";
 
-// Define Student schema
 const studentSchema = new mongoose.Schema(
   {
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true, // Allows null values for uniqueness
+    },
     username: {
       type: String,
       required: true,
@@ -16,8 +20,8 @@ const studentSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      required: true,
-      enum: ["student", "teacher"],
+      default: "student",
+      enum: ["student"],
     },
     isApproved: {
       type: Boolean,
@@ -25,7 +29,9 @@ const studentSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return !this.googleId; // Password is required only if googleId is not present
+      },
     },
   },
   { timestamps: true }

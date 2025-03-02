@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom"; // Remove `Router` i
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import toast CSS
 import Login from "./pages/Login";
-import SignUp from "./pages/SignUp"; 
+import Signup from "./pages/SignUp";
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -15,7 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected Routes */}
