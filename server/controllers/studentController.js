@@ -78,7 +78,7 @@ export const login = async (req, res) => {
       sameSite: "Strict",
     });
 
-    return res.json({ message: "Login successful", accessToken });
+    return res.json({ message: "Login successful", accessToken , student });
   } catch (error) {
     return res
       .status(500)

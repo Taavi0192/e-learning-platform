@@ -1,12 +1,14 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
+  const [userName, setUserName] = useState(null);
+  const navigate = useNavigate();
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
@@ -56,7 +58,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Login function
-  // Login function
   const login = async ({ email, password, role }) => {
     console.log(email, password, role);
     try {
@@ -64,6 +65,8 @@ export const AuthProvider = ({ children }) => {
       const res = await api.post(`/login`, { email, password });
 
       const token = res.data.accessToken;
+      const userName = res.data.student.username;
+      setUserName(userName);
       setAccessToken(token);
 
       const decodedUser = decodeToken(token);
@@ -74,6 +77,7 @@ export const AuthProvider = ({ children }) => {
 
         localStorage.setItem("user", JSON.stringify(decodedUser));
         localStorage.setItem("role", decodedUser.role);
+        localStorage.setItem("userName", userName);
       }
     } catch (error) {
       throw new Error(error.response?.data?.message || "Invalid credentials");
@@ -96,7 +100,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem("role");
 
       await api.post(`/logout`);
-      Navigate("/login");
+      navigate("/login");
     } catch (error) {
       console.error(
         "Logout error:",
@@ -174,16 +178,23 @@ export const AuthProvider = ({ children }) => {
     fetchToken();
   }, []);
 
+  // Helper function to check if the user is authenticated
+  const isAuthenticated = () => {
+    return !!accessToken && !!user;
+  };
+
   return (
     <AuthContext.Provider
       value={{
         accessToken,
+        userName,
         user,
         role,
         login,
         signUp,
         logout,
         loading,
+        isAuthenticated, // Add this helper function
         api: getApiInstance(role), // Always use a fresh API instance
       }}
     >
