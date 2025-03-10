@@ -73,8 +73,9 @@ export const AuthProvider = ({ children }) => {
       const api = getApiInstance(role);
       const res = await api.post('/login', { email, password });
 
+      console.log(res)
       const token = res.data.accessToken;
-      const userData = res.data[role]; // Dynamically get user info
+      const userData = res.data[role]; 
 
       setAccessToken(token);
       setUserName(userData.username);
