@@ -1,98 +1,104 @@
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
 import { 
   FiHome, FiBook, FiUsers, FiClipboard, FiCalendar, 
   FiCheckSquare, FiFileText, FiSettings, FiLogOut 
 } from "react-icons/fi";
 
-const TeacherSidebar = ({ activeTab, setActiveTab }) => {
+const TeacherSidebar = () => {
+  const location = useLocation(); // Get current route
+
+  // Function to check if a tab is active
+  const isActive = (path) => location.pathname.startsWith(path);
+
   return (
-    <aside className="w-64 bg-white shadow-lg sticky top-16 h-[calc(100vh-4rem)]">
+    <aside className="bg-white shadow-lg h-[calc(100vh-4rem)] sticky top-16">
       <div className="flex flex-col h-full py-6 px-4">
         <nav className="flex-1 space-y-2">
-          <button
-            onClick={() => setActiveTab("dashboard")}
+          <Link
+            to="/teacher-dashboard"
             className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              activeTab === "dashboard" ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
+              isActive("/teacher-dashboard") && !isActive("/teacher-dashboard/") ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
             }`}
           >
             <FiHome className="mr-3 h-5 w-5" />
             Dashboard
-          </button>
-          
-          <button
-            onClick={() => setActiveTab("courses")}
+          </Link>
+
+          <Link
+            to="/teacher-dashboard/courses"
             className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              activeTab === "courses" ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
+              isActive("/teacher-dashboard/courses") ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
             }`}
           >
             <FiBook className="mr-3 h-5 w-5" />
             My Courses
-          </button>
-          
-          <button
-            onClick={() => setActiveTab("students")}
+          </Link>
+
+          <Link
+            to="/teacher-dashboard/students"
             className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              activeTab === "students" ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
+              isActive("/teacher-dashboard/students") ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
             }`}
           >
             <FiUsers className="mr-3 h-5 w-5" />
             Students
-          </button>
-          
-          <button
-            onClick={() => setActiveTab("assignments")}
+          </Link>
+
+          <Link
+            to="/teacher-dashboard/assignments"
             className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              activeTab === "assignments" ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
+              isActive("/teacher-dashboard/assignments") ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
             }`}
           >
             <FiClipboard className="mr-3 h-5 w-5" />
             Assignments
-          </button>
-          
-          <button
-            onClick={() => setActiveTab("attendance")}
+          </Link>
+
+          <Link
+            to="/teacher-dashboard/attendance"
             className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              activeTab === "attendance" ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
+              isActive("/teacher-dashboard/attendance") ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
             }`}
           >
             <FiCalendar className="mr-3 h-5 w-5" />
             Attendance
-          </button>
-          
-          <button
-            onClick={() => setActiveTab("grades")}
+          </Link>
+
+          <Link
+            to="/teacher-dashboard/grades"
             className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              activeTab === "grades" ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
+              isActive("/teacher-dashboard/grades") ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
             }`}
           >
             <FiCheckSquare className="mr-3 h-5 w-5" />
             Grades
-          </button>
-          
-          <button
-            onClick={() => setActiveTab("materials")}
+          </Link>
+
+          <Link
+            to="/teacher-dashboard/materials"
             className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              activeTab === "materials" ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
+              isActive("/teacher-dashboard/materials") ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
             }`}
           >
             <FiFileText className="mr-3 h-5 w-5" />
             Course Materials
-          </button>
-          
-          <button
-            onClick={() => setActiveTab("settings")}
+          </Link>
+
+          <Link
+            to="/teacher-dashboard/settings"
             className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              activeTab === "settings" ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
+              isActive("/teacher-dashboard/settings") ? "bg-[#19a4db] text-white" : "text-gray-700 hover:bg-gray-100"
             }`}
           >
             <FiSettings className="mr-3 h-5 w-5" />
             Settings
-          </button>
+          </Link>
         </nav>
-        
+
         <div className="pt-6 mt-6 border-t border-gray-200">
           <button
-            onClick={() => window.location.href = "/login"}
+            onClick={() => (window.location.href = "/login")}
             className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
           >
             <FiLogOut className="mr-3 h-5 w-5" />
@@ -104,4 +110,4 @@ const TeacherSidebar = ({ activeTab, setActiveTab }) => {
   );
 };
 
-export default TeacherSidebar; 
+export default TeacherSidebar;

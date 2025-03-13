@@ -67,7 +67,7 @@ const Students = ({ coursesList }) => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex flex-wrap justify-between items-center mb-6">
           <h2 className="text-xl font-bold">Students</h2>
