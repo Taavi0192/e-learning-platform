@@ -86,7 +86,8 @@ const Courses = ({ courses }) => {
               
               <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button 
-                  onClick={() => navigate(`/teacher/courses/${course.id}/manage`)}
+                  // onClick={() => navigate(`/teacher/courses/${course.id}/manage`)}
+                  onClick={() => navigate(`/teacher-dashboard/courses/manage`)}
                   className="flex justify-center items-center px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm font-medium"
                 >
                   Manage Course
