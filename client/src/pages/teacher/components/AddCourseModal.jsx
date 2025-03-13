@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { FiX, FiUpload } from "react-icons/fi";
+import axios from "axios";
 
 const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
   const [courseImage, setCourseImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  
+
   // Form state
   const [courseForm, setCourseForm] = useState({
     name: "",
@@ -22,7 +23,7 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
     const { name, value } = e.target;
     setCourseForm({
       ...courseForm,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -38,10 +39,34 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit({ ...courseForm, image: courseImage });
-    resetForm();
+    try {
+      const formData = new FormData();
+      Object.keys(courseForm).forEach((key) => {
+        formData.append(key, courseForm[key]);
+      });
+      if (courseImage) {
+        formData.append("thumbnail", courseImage);
+      }
+      const token = localStorage.getItem("accessToken");
+
+      const response = await axios.post(
+        "http://localhost:5000/api/courses/addCourse",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      onSubmit(response.data.course);
+      resetForm();
+    } catch (error) {
+      console.error("Error adding course:", error);
+    }
   };
 
   const resetForm = () => {
@@ -66,7 +91,9 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
       <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 md:mx-auto max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b px-6 py-4">
-          <h3 className="text-xl font-semibold text-gray-800">Add New Course</h3>
+          <h3 className="text-xl font-semibold text-gray-800">
+            Add New Course
+          </h3>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -108,7 +135,7 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
                 />
               </div>
             </div>
-            
+
             {/* Course Details - 2 columns */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <div>
@@ -142,7 +169,7 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
                 />
               </div>
             </div>
-            
+
             {/* More Course Details - 2 columns */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <div>
@@ -177,7 +204,7 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
                 </select>
               </div>
             </div>
-            
+
             {/* Category and Instructor */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <div>
@@ -209,7 +236,7 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
                 />
               </div>
             </div>
-            
+
             {/* Course Image */}
             <div className="mt-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -263,7 +290,7 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
                 </div>
               </div>
             </div>
-            
+
             {/* Course Description - Full Width */}
             <div className="mt-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -279,7 +306,7 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
                 placeholder="Provide a detailed description of your course"
               ></textarea>
             </div>
-            
+
             {/* Form Actions */}
             <div className="mt-6 flex justify-end space-x-3">
               <button
@@ -303,4 +330,4 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
   );
 };
 
-export default AddCourseModal; 
+export default AddCourseModal;

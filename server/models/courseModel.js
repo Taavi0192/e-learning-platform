@@ -25,7 +25,7 @@ const courseSchema = new mongoose.Schema(
     },
     difficulty: {
       type: String,
-      enum: ["Beginner", "Intermediate", "Advanced"],
+      enum: ["beginner", "intermediate", "advanced"],
       required: true,
     },
     category: {
@@ -48,6 +48,49 @@ const courseSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Student",
+      },
+    ],
+    teacher: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Teacher",
+      required: true,
+    },
+    assignments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Assignment",
+      },
+    ],
+    modules: [
+      {
+        title: {
+          type: String,
+          required: true,
+        },
+        description: {
+          type: String,
+          required: false,
+        },
+        lessons: [
+          {
+            title: {
+              type: String,
+              required: true,
+            },
+            duration: {
+              type: String,
+              required: true,
+            },
+            description: {
+              type: String,
+              required: false,
+            },
+            material: {
+              type: String,
+              required: false,
+            },
+          },
+        ],
       },
     ],
   },

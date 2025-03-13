@@ -1,32 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { 
-  FiPlus, FiAward, FiArrowLeft, FiSave, FiUpload, FiX, 
-  FiChevronDown, FiChevronRight, FiFile, FiLink, FiVideo, 
-  FiDownload, FiEdit, FiTrash2, FiClock 
+import {
+  FiPlus,
+  FiAward,
+  FiArrowLeft,
+  FiSave,
+  FiUpload,
+  FiX,
+  FiChevronDown,
+  FiChevronRight,
+  FiFile,
+  FiLink,
+  FiVideo,
+  FiDownload,
+  FiEdit,
+  FiTrash2,
+  FiClock,
 } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 const ManageCourse = () => {
   const navigate = useNavigate();
+  const { courseId } = useParams();
   const [activeTab, setActiveTab] = useState("basic");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [courseImage, setCourseImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  
+
   // Add modal states
   const [isModuleModalOpen, setIsModuleModalOpen] = useState(false);
   const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false);
   const [newModule, setNewModule] = useState({ title: "", description: "" });
-  const [newMaterial, setNewMaterial] = useState({ 
-    title: "", 
-    type: "pdf", 
-    url: "", 
+  const [newMaterial, setNewMaterial] = useState({
+    title: "",
+    type: "pdf",
+    url: "",
     file: null,
     duration: "",
-    size: ""
+    size: "",
   });
-  
+
   // Add these new state variables
   const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const [currentModuleId, setCurrentModuleId] = useState(null);
@@ -39,15 +53,9 @@ const ManageCourse = () => {
     material: null,
     materialType: "none", // none, video, pdf, link
     materialName: "",
-    materialUrl: ""
+    materialUrl: "",
   });
-  
-  // Mock data for notifications
-  const notifications = [
-    { id: 1, type: 'message', text: 'New message from student', time: '10m ago' },
-    { id: 2, type: 'alert', text: 'Assignment submissions ready for review', time: '1h ago' },
-  ];
-  
+
   const [course, setCourse] = useState({
     name: "",
     code: "",
@@ -74,9 +82,13 @@ const ManageCourse = () => {
       expanded: true,
       lessons: [
         { id: 1, title: "What is React?", duration: "10 min" },
-        { id: 2, title: "Setting up your development environment", duration: "15 min" },
-        { id: 3, title: "Your first React component", duration: "20 min" }
-      ]
+        {
+          id: 2,
+          title: "Setting up your development environment",
+          duration: "15 min",
+        },
+        { id: 3, title: "Your first React component", duration: "20 min" },
+      ],
     },
     {
       id: 2,
@@ -84,46 +96,50 @@ const ManageCourse = () => {
       expanded: false,
       lessons: [
         { id: 4, title: "Props and State", duration: "25 min" },
-        { id: 5, title: "Component lifecycle", duration: "15 min" }
-      ]
-    }
+        { id: 5, title: "Component lifecycle", duration: "15 min" },
+      ],
+    },
   ]);
-  
+
   const [materials, setMaterials] = useState([
     { id: 1, title: "React Fundamentals PDF", type: "pdf", size: "2.4 MB" },
-    { id: 2, title: "React Documentation", type: "link", url: "https://reactjs.org/docs" },
-    { id: 3, title: "Introduction to JSX", type: "video", duration: "15:30" }
+    {
+      id: 2,
+      title: "React Documentation",
+      type: "link",
+      url: "https://reactjs.org/docs",
+    },
+    { id: 3, title: "Introduction to JSX", type: "video", duration: "15:30" },
   ]);
 
   // Load course data when component mounts
   useEffect(() => {
-    // In a real app, you'd fetch the course data from your API
-    // For now, let's simulate loading with mock data
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      // Mock data for the course being edited
-      setCourse({
-        id: "1",
-        name: "Introduction to React",
-        code: "REACT101",
-        maxStudents: "25",
-        price: "3499",
-        duration: "10",
-        difficultyLevel: "intermediate",
-        category: "Web Development",
-        instructorName: "Dr. Jane Smith",
-        description: "Learn the fundamentals of React including components, state, and hooks.",
-        hasModules: true,
-        hasQuizzes: true,
-        certificateOffered: true,
-        certificateTitle: "React Fundamentals Certificate",
-        certificateDescription: "For completing the Introduction to React course",
-      });
-      
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+    const fetchCourseData = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const response = await axios.get(
+          `http://localhost:5000/api/courses/${courseId}/manage`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setCourse(response.data.course);
+        setModules(response.data.course.modules || []);
+        setMaterials(response.data.course.materials || []);
+        console.log(response.data.course);
+      } catch (error) {
+        console.error("Error fetching course data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (courseId) {
+      fetchCourseData();
+    }
+  }, [courseId]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -152,40 +168,55 @@ const ManageCourse = () => {
     setImagePreview(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    // Simulate API call to update course
-    setTimeout(() => {
-      setIsSaving(false);
+    try {
+      const token = localStorage.getItem("accessToken");
+      await axios.put(
+        `http://localhost:5000/api/courses/${courseId}/manage`,
+        course,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       alert("Course updated successfully!");
-      navigate('/teacher-dashboard/courses');
-    }, 1500);
+      navigate("/teacher-dashboard/courses");
+    } catch (error) {
+      console.error("Error updating course:", error);
+      alert("Failed to update course.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Add these functions to handle modules and lessons
   const toggleModule = (moduleId) => {
-    setModules(modules.map(module => 
-      module.id === moduleId 
-        ? { ...module, expanded: !module.expanded } 
-        : module
-    ));
+    setModules(
+      modules.map((module) =>
+        module.id === moduleId
+          ? { ...module, expanded: !module.expanded }
+          : module
+      )
+    );
   };
-  
+
   const addNewModule = () => {
     const newModule = {
       id: Date.now(),
       title: "New Module",
       expanded: true,
-      lessons: []
+      lessons: [],
     };
     setModules([...modules, newModule]);
   };
-  
+
   const openEditLessonModal = (moduleId, lesson) => {
     setCurrentModuleId(moduleId);
     setCurrentLessonId(lesson.id);
     setIsEditingLesson(true);
-    
+
     // Populate the form with existing lesson data
     setNewLesson({
       title: lesson.title || "",
@@ -194,9 +225,9 @@ const ManageCourse = () => {
       material: null, // Can't restore the actual file object
       materialType: lesson.materialType || "none",
       materialName: lesson.materialName || "",
-      materialUrl: lesson.materialUrl || ""
+      materialUrl: lesson.materialUrl || "",
     });
-    
+
     setIsLessonModalOpen(true);
   };
 
@@ -204,7 +235,7 @@ const ManageCourse = () => {
     setCurrentModuleId(moduleId);
     setCurrentLessonId(null);
     setIsEditingLesson(false);
-    
+
     // Reset the form for adding a new lesson
     setNewLesson({
       title: "",
@@ -213,77 +244,96 @@ const ManageCourse = () => {
       material: null,
       materialType: "none",
       materialName: "",
-      materialUrl: ""
+      materialUrl: "",
     });
-    
+
     setIsLessonModalOpen(true);
   };
 
   const handleLessonInputChange = (e) => {
     const { name, value } = e.target;
-    setNewLesson(prev => ({ ...prev, [name]: value }));
+    setNewLesson((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleLessonMaterialChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const fileType = file.type.startsWith('video') ? 'video' : 
-                       file.type === 'application/pdf' ? 'pdf' : 'file';
-      
-      setNewLesson(prev => ({ 
-        ...prev, 
+      const fileType = file.type.startsWith("video")
+        ? "video"
+        : file.type === "application/pdf"
+        ? "pdf"
+        : "file";
+
+      setNewLesson((prev) => ({
+        ...prev,
         material: file,
         materialType: fileType,
-        materialName: file.name
+        materialName: file.name,
       }));
     }
   };
 
-  const submitLesson = () => {
+  const submitLesson = async () => {
     if (!newLesson.title.trim()) {
       alert("Lesson title is required");
       return;
     }
 
-    const lessonData = {
-      id: isEditingLesson ? currentLessonId : Date.now(),
-      title: newLesson.title,
-      duration: newLesson.duration || "0 min",
-      description: newLesson.description,
-      materialType: newLesson.materialType,
-      materialName: newLesson.materialName,
-      materialUrl: newLesson.materialUrl
-    };
+    if (!newLesson.duration.trim()) {
+      alert("Lesson duration is required");
+      return;
+    }
 
-    setModules(modules.map(module => {
-      if (module.id === currentModuleId) {
-        if (isEditingLesson) {
-          // Update existing lesson
-          const updatedLessons = module.lessons.map(lesson => 
-            lesson.id === currentLessonId ? lessonData : lesson
-          );
-          return { ...module, lessons: updatedLessons };
-        } else {
-          // Add new lesson
-          return { ...module, lessons: [...module.lessons, lessonData] };
-        }
+    try {
+      const token = localStorage.getItem("accessToken");
+      const formData = new FormData();
+      formData.append("title", newLesson.title.trim());
+      formData.append("duration", newLesson.duration.trim());
+      formData.append("description", newLesson.description);
+      formData.append("materialType", newLesson.materialType);
+      formData.append("materialUrl", newLesson.materialUrl);
+
+      // If a file is uploaded, append it to the form data
+      if (newLesson.material) {
+        formData.append("material", newLesson.material);
       }
-      return module;
-    }));
-    
-    // Reset form and close modal
-    setNewLesson({
-      title: "",
-      duration: "",
-      description: "",
-      material: null,
-      materialType: "none",
-      materialName: "",
-      materialUrl: ""
-    });
-    setIsLessonModalOpen(false);
-    setIsEditingLesson(false);
-    setCurrentLessonId(null);
+
+      const response = await axios.post(
+        `http://localhost:5000/api/courses/${courseId}/modules/${currentModuleId}/lessons`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setModules(
+        modules.map((module) =>
+          module._id === currentModuleId
+            ? { ...module, lessons: [...module.lessons, response.data.lesson] }
+            : module
+        )
+      );
+
+      // Reset form and close modal
+      setNewLesson({
+        title: "",
+        duration: "",
+        description: "",
+        material: null,
+        materialType: "none",
+        materialName: "",
+        materialUrl: "",
+      });
+      setIsLessonModalOpen(false);
+      setIsEditingLesson(false);
+      setCurrentLessonId(null);
+    } catch (error) {
+      console.error("Error adding lesson:", error);
+      alert("Failed to add lesson.");
+    }
   };
 
   // Update existing addNewLesson function
@@ -294,13 +344,13 @@ const ManageCourse = () => {
   // Add this function to handle form input changes for the module modal
   const handleModuleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewModule(prev => ({ ...prev, [name]: value }));
+    setNewModule((prev) => ({ ...prev, [name]: value }));
   };
 
   // Add this function to handle form input changes for the material modal
   const handleMaterialInputChange = (e) => {
     const { name, value } = e.target;
-    setNewMaterial(prev => ({ ...prev, [name]: value }));
+    setNewMaterial((prev) => ({ ...prev, [name]: value }));
   };
 
   // Add this function to handle file selection for materials
@@ -308,34 +358,39 @@ const ManageCourse = () => {
     const file = e.target.files[0];
     if (file) {
       // Update the file field
-      setNewMaterial(prev => ({ 
-        ...prev, 
+      setNewMaterial((prev) => ({
+        ...prev,
         file: file,
-        size: (file.size / (1024 * 1024)).toFixed(2) + " MB" // Convert to MB
+        size: (file.size / (1024 * 1024)).toFixed(2) + " MB", // Convert to MB
       }));
     }
   };
 
   // Add this function to handle submitting the new module
-  const submitNewModule = () => {
+  const submitNewModule = async () => {
     if (!newModule.title.trim()) {
       alert("Module title is required");
       return;
     }
 
-    const moduleToAdd = {
-      id: Date.now(),
-      title: newModule.title,
-      description: newModule.description,
-      expanded: true,
-      lessons: []
-    };
-
-    setModules([...modules, moduleToAdd]);
-    
-    // Reset form and close modal
-    setNewModule({ title: "", description: "" });
-    setIsModuleModalOpen(false);
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await axios.post(
+        `http://localhost:5000/api/courses/${courseId}/modules`,
+        newModule,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setModules([...modules, response.data.module]);
+      setNewModule({ title: "", description: "" });
+      setIsModuleModalOpen(false);
+    } catch (error) {
+      console.error("Error adding module:", error);
+      alert("Failed to add module.");
+    }
   };
 
   // Add this function to handle submitting the new material
@@ -350,7 +405,10 @@ const ManageCourse = () => {
       return;
     }
 
-    if ((newMaterial.type === "pdf" || newMaterial.type === "video") && !newMaterial.file) {
+    if (
+      (newMaterial.type === "pdf" || newMaterial.type === "video") &&
+      !newMaterial.file
+    ) {
       alert("File is required");
       return;
     }
@@ -361,22 +419,24 @@ const ManageCourse = () => {
       type: newMaterial.type,
       url: newMaterial.url,
       size: newMaterial.size,
-      duration: newMaterial.duration
+      duration: newMaterial.duration,
     };
 
     setMaterials([...materials, materialToAdd]);
-    
+
     // Reset form and close modal
-    setNewMaterial({ 
-      title: "", 
-      type: "pdf", 
-      url: "", 
+    setNewMaterial({
+      title: "",
+      type: "pdf",
+      url: "",
       file: null,
       duration: "",
-      size: ""
+      size: "",
     });
     setIsMaterialModalOpen(false);
   };
+
+  console.log(course);
 
   return (
     <div className="w-full">
@@ -388,7 +448,9 @@ const ManageCourse = () => {
         <div className="bg-white rounded-xl shadow-sm">
           {/* Main content area */}
           <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">Manage Course: {course.name}</h1>
+            <h1 className="text-2xl font-bold mb-6">
+              Manage Course: {course.courseName}
+            </h1>
 
             {/* Tabs */}
             <div className="flex border-b border-gray-200 mb-6">
@@ -436,13 +498,13 @@ const ManageCourse = () => {
                     <input
                       type="text"
                       name="name"
-                      value={course.name}
+                      value={course.courseName}
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#19a4db]"
                       required
                     />
                   </div>
-                  
+
                   {/* Course Code */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -451,14 +513,14 @@ const ManageCourse = () => {
                     <input
                       type="text"
                       name="code"
-                      value={course.code}
+                      value={course.courseCode}
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#19a4db]"
                       required
                     />
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Max Students */}
                   <div>
@@ -474,7 +536,7 @@ const ManageCourse = () => {
                       required
                     />
                   </div>
-                  
+
                   {/* Price */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -490,7 +552,7 @@ const ManageCourse = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Duration */}
                   <div>
@@ -506,7 +568,7 @@ const ManageCourse = () => {
                       required
                     />
                   </div>
-                  
+
                   {/* Difficulty Level */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -514,7 +576,7 @@ const ManageCourse = () => {
                     </label>
                     <select
                       name="difficultyLevel"
-                      value={course.difficultyLevel}
+                      value={course.difficulty}
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#19a4db]"
                       required
@@ -525,7 +587,7 @@ const ManageCourse = () => {
                     </select>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Category */}
                   <div>
@@ -541,7 +603,7 @@ const ManageCourse = () => {
                       required
                     />
                   </div>
-                  
+
                   {/* Instructor Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -557,18 +619,18 @@ const ManageCourse = () => {
                     />
                   </div>
                 </div>
-                
+
                 {/* Course Thumbnail */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Course Thumbnail / Image
                   </label>
-                  
-                  {imagePreview ? (
+
+                  {course.thumbnail ? (
                     <div className="mt-1 relative border border-gray-200 rounded-lg p-2">
-                      <img 
-                        src={imagePreview} 
-                        alt="Course thumbnail preview" 
+                      <img
+                        src={`http://localhost:5000/${course.thumbnail}`}
+                        alt="Course thumbnail preview"
                         className="max-h-40 mx-auto"
                       />
                       <button
@@ -606,7 +668,7 @@ const ManageCourse = () => {
                     </div>
                   )}
                 </div>
-                
+
                 {/* Course Description */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -621,7 +683,7 @@ const ManageCourse = () => {
                     required
                   ></textarea>
                 </div>
-                
+
                 {/* Additional Features */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -637,7 +699,10 @@ const ManageCourse = () => {
                         onChange={handleCheckChange}
                         className="h-4 w-4 text-[#19a4db] focus:ring-[#19a4db] border-gray-300 rounded"
                       />
-                      <label htmlFor="hasModules" className="ml-2 block text-sm text-gray-700">
+                      <label
+                        htmlFor="hasModules"
+                        className="ml-2 block text-sm text-gray-700"
+                      >
                         Includes Modules
                       </label>
                     </div>
@@ -650,7 +715,10 @@ const ManageCourse = () => {
                         onChange={handleCheckChange}
                         className="h-4 w-4 text-[#19a4db] focus:ring-[#19a4db] border-gray-300 rounded"
                       />
-                      <label htmlFor="hasQuizzes" className="ml-2 block text-sm text-gray-700">
+                      <label
+                        htmlFor="hasQuizzes"
+                        className="ml-2 block text-sm text-gray-700"
+                      >
                         Includes Quizzes
                       </label>
                     </div>
@@ -663,7 +731,10 @@ const ManageCourse = () => {
                         onChange={handleCheckChange}
                         className="h-4 w-4 text-[#19a4db] focus:ring-[#19a4db] border-gray-300 rounded"
                       />
-                      <label htmlFor="certificateOffered" className="ml-2 block text-sm text-gray-700">
+                      <label
+                        htmlFor="certificateOffered"
+                        className="ml-2 block text-sm text-gray-700"
+                      >
                         Offers Certificate
                       </label>
                     </div>
@@ -677,7 +748,7 @@ const ManageCourse = () => {
               <div>
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold">Course Content</h2>
-                  <button 
+                  <button
                     onClick={() => setIsModuleModalOpen(true)}
                     className="px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm flex items-center"
                   >
@@ -685,31 +756,40 @@ const ManageCourse = () => {
                     Add Module
                   </button>
                 </div>
-                
+
                 {/* Modules/Sections Section */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-medium mb-4">Modules / Sections</h3>
-                  
+                  <h3 className="text-lg font-medium mb-4">
+                    Modules / Sections
+                  </h3>
+
                   <div className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-                    {modules.map(module => (
-                      <div key={module.id} className="border-b border-gray-200 last:border-b-0">
-                        <div 
+                    {modules.map((module) => (
+                      <div
+                        key={module._id}
+                        className="border-b border-gray-200 last:border-b-0"
+                      >
+                        <div
                           className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-100"
                           onClick={() => toggleModule(module.id)}
                         >
                           <div className="flex items-center">
-                            {module.expanded ? 
-                              <FiChevronDown className="text-gray-500 mr-2" /> : 
+                            {module.expanded ? (
+                              <FiChevronDown className="text-gray-500 mr-2" />
+                            ) : (
                               <FiChevronRight className="text-gray-500 mr-2" />
-                            }
+                            )}
                             <span className="font-medium">{module.title}</span>
                             <span className="ml-3 text-sm text-gray-500">
-                              {module.lessons.length} {module.lessons.length === 1 ? 'lesson' : 'lessons'}
+                              {module.lessons.length}{" "}
+                              {module.lessons.length === 1
+                                ? "lesson"
+                                : "lessons"}
                             </span>
                           </div>
-                          
+
                           <div className="flex space-x-2">
-                            <button 
+                            <button
                               className="p-1 text-[#19a4db] hover:bg-blue-50 rounded"
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -723,24 +803,34 @@ const ManageCourse = () => {
                             </button>
                           </div>
                         </div>
-                        
+
                         {module.expanded && (
                           <div className="bg-white pl-10 pr-4 py-2 border-t border-gray-100">
                             {module.lessons.length > 0 ? (
                               <ul className="divide-y divide-gray-100">
-                                {module.lessons.map(lesson => (
-                                  <li key={lesson.id} className="py-3 flex justify-between items-center">
+                                {module.lessons.map((lesson) => (
+                                  <li
+                                    key={lesson.id}
+                                    className="py-3 flex justify-between items-center"
+                                  >
                                     <div className="flex items-center">
-                                      <span className="mr-3 text-sm text-gray-500">•</span>
+                                      <span className="mr-3 text-sm text-gray-500">
+                                        •
+                                      </span>
                                       <span>{lesson.title}</span>
-                                      <span className="ml-3 text-xs text-gray-400">{lesson.duration}</span>
+                                      <span className="ml-3 text-xs text-gray-400">
+                                        {lesson.duration}
+                                      </span>
                                     </div>
                                     <div className="flex space-x-1">
-                                      <button 
+                                      <button
                                         className="p-1 text-gray-400 hover:text-blue-500"
                                         onClick={(e) => {
                                           e.stopPropagation();
-                                          openEditLessonModal(module.id, lesson);
+                                          openEditLessonModal(
+                                            module._id,
+                                            lesson
+                                          );
                                         }}
                                       >
                                         <FiEdit size={15} />
@@ -753,15 +843,17 @@ const ManageCourse = () => {
                                 ))}
                               </ul>
                             ) : (
-                              <p className="py-3 text-sm text-gray-500 italic">No lessons in this module yet.</p>
+                              <p className="py-3 text-sm text-gray-500 italic">
+                                No lessons in this module yet.
+                              </p>
                             )}
-                            
+
                             <div className="py-2">
-                              <button 
+                              <button
                                 className="text-sm text-[#19a4db] hover:underline flex items-center"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  openLessonModal(module.id);
+                                  openLessonModal(module._id);
                                 }}
                               >
                                 <FiPlus className="mr-1" size={14} />
@@ -772,11 +864,13 @@ const ManageCourse = () => {
                         )}
                       </div>
                     ))}
-                    
+
                     {modules.length === 0 && (
                       <div className="p-6 text-center">
-                        <p className="text-gray-500 mb-4">No modules created yet.</p>
-                        <button 
+                        <p className="text-gray-500 mb-4">
+                          No modules created yet.
+                        </p>
+                        <button
                           onClick={() => setIsModuleModalOpen(true)}
                           className="px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm"
                         >
@@ -786,12 +880,12 @@ const ManageCourse = () => {
                     )}
                   </div>
                 </div>
-                
+
                 {/* Course Materials Section */}
                 <div>
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-medium">Course Materials</h3>
-                    <button 
+                    <button
                       onClick={() => setIsMaterialModalOpen(true)}
                       className="px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm flex items-center"
                     >
@@ -799,38 +893,52 @@ const ManageCourse = () => {
                       Add Material
                     </button>
                   </div>
-                  
+
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     {materials.length > 0 ? (
                       <div className="overflow-hidden">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {materials.map(material => (
-                            <div 
-                              key={material.id} 
+                          {materials.map((material) => (
+                            <div
+                              key={material.id}
                               className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow flex flex-col"
                             >
                               <div className="flex items-start mb-2">
-                                {material.type === 'pdf' && (
-                                  <FiFile className="text-red-500 mr-3 mt-1 flex-shrink-0" size={20} />
+                                {material.type === "pdf" && (
+                                  <FiFile
+                                    className="text-red-500 mr-3 mt-1 flex-shrink-0"
+                                    size={20}
+                                  />
                                 )}
-                                {material.type === 'link' && (
-                                  <FiLink className="text-blue-500 mr-3 mt-1 flex-shrink-0" size={20} />
+                                {material.type === "link" && (
+                                  <FiLink
+                                    className="text-blue-500 mr-3 mt-1 flex-shrink-0"
+                                    size={20}
+                                  />
                                 )}
-                                {material.type === 'video' && (
-                                  <FiVideo className="text-purple-500 mr-3 mt-1 flex-shrink-0" size={20} />
+                                {material.type === "video" && (
+                                  <FiVideo
+                                    className="text-purple-500 mr-3 mt-1 flex-shrink-0"
+                                    size={20}
+                                  />
                                 )}
                                 <div className="flex-1">
-                                  <h4 className="font-medium">{material.title}</h4>
+                                  <h4 className="font-medium">
+                                    {material.title}
+                                  </h4>
                                   <p className="text-xs text-gray-500 mt-1">
-                                    {material.type === 'pdf' && `PDF • ${material.size}`}
-                                    {material.type === 'link' && 'External Resource'}
-                                    {material.type === 'video' && `Video • ${material.duration}`}
+                                    {material.type === "pdf" &&
+                                      `PDF • ${material.size}`}
+                                    {material.type === "link" &&
+                                      "External Resource"}
+                                    {material.type === "video" &&
+                                      `Video • ${material.duration}`}
                                   </p>
                                 </div>
                               </div>
-                              
+
                               <div className="mt-auto pt-2 flex justify-end space-x-1">
-                                {material.type === 'pdf' && (
+                                {material.type === "pdf" && (
                                   <button className="p-1 text-gray-500 hover:text-blue-500">
                                     <FiDownload size={16} />
                                   </button>
@@ -848,11 +956,16 @@ const ManageCourse = () => {
                       </div>
                     ) : (
                       <div className="p-6 text-center">
-                        <p className="text-gray-500 mb-4">No course materials added yet.</p>
+                        <p className="text-gray-500 mb-4">
+                          No course materials added yet.
+                        </p>
                         <div className="flex justify-center space-x-3">
-                          <button 
+                          <button
                             onClick={() => {
-                              setNewMaterial(prev => ({ ...prev, type: "pdf" }));
+                              setNewMaterial((prev) => ({
+                                ...prev,
+                                type: "pdf",
+                              }));
                               setIsMaterialModalOpen(true);
                             }}
                             className="px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm flex items-center"
@@ -860,9 +973,12 @@ const ManageCourse = () => {
                             <FiUpload className="mr-2" />
                             Upload File
                           </button>
-                          <button 
+                          <button
                             onClick={() => {
-                              setNewMaterial(prev => ({ ...prev, type: "link" }));
+                              setNewMaterial((prev) => ({
+                                ...prev,
+                                type: "link",
+                              }));
                               setIsMaterialModalOpen(true);
                             }}
                             className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm flex items-center"
@@ -881,8 +997,10 @@ const ManageCourse = () => {
             {/* Certificates Tab Content */}
             {activeTab === "certificates" && (
               <div>
-                <p className="text-gray-600 mb-4">Configure course completion certificates.</p>
-                
+                <p className="text-gray-600 mb-4">
+                  Configure course completion certificates.
+                </p>
+
                 {course.certificateOffered ? (
                   <div className="space-y-6">
                     <div>
@@ -897,7 +1015,7 @@ const ManageCourse = () => {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#19a4db]"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Certificate Description
@@ -910,7 +1028,7 @@ const ManageCourse = () => {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#19a4db]"
                       ></textarea>
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Certificate Template
@@ -942,12 +1060,20 @@ const ManageCourse = () => {
                 ) : (
                   <div className="bg-gray-50 p-6 rounded-lg text-center">
                     <FiAward className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-1">Certificate Not Enabled</h3>
-                    <p className="text-gray-500 mb-4">Enable certificates in the Basic Info tab to configure them.</p>
+                    <h3 className="text-lg font-medium text-gray-900 mb-1">
+                      Certificate Not Enabled
+                    </h3>
+                    <p className="text-gray-500 mb-4">
+                      Enable certificates in the Basic Info tab to configure
+                      them.
+                    </p>
                     <button
                       type="button"
                       onClick={() => {
-                        setCourse(prev => ({ ...prev, certificateOffered: true }));
+                        setCourse((prev) => ({
+                          ...prev,
+                          certificateOffered: true,
+                        }));
                         setActiveTab("basic");
                       }}
                       className="px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm"
@@ -964,7 +1090,7 @@ const ManageCourse = () => {
           <div className="flex justify-between items-center px-8 py-4 border-t border-gray-200 bg-gray-50">
             <button
               type="button"
-              onClick={() => navigate('/teacher-dashboard/courses')}
+              onClick={() => navigate("/teacher-dashboard/courses")}
               className="px-4 py-2 text-gray-700 flex items-center rounded-lg hover:bg-gray-100"
             >
               <FiArrowLeft className="mr-2" />
@@ -973,7 +1099,7 @@ const ManageCourse = () => {
             <div className="flex space-x-3">
               <button
                 type="button"
-                onClick={() => navigate('/teacher-dashboard/courses')}
+                onClick={() => navigate("/teacher-dashboard/courses")}
                 className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg"
               >
                 Cancel
@@ -981,14 +1107,34 @@ const ManageCourse = () => {
               <button
                 type="button"
                 onClick={handleSave}
-                className={`px-6 py-2 bg-[#19a4db] text-white rounded-lg flex items-center ${isSaving ? 'opacity-70 cursor-not-allowed' : 'hover:bg-[#1582af]'}`}
+                className={`px-6 py-2 bg-[#19a4db] text-white rounded-lg flex items-center ${
+                  isSaving
+                    ? "opacity-70 cursor-not-allowed"
+                    : "hover:bg-[#1582af]"
+                }`}
                 disabled={isSaving}
               >
                 {isSaving ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Saving...
                   </>
@@ -1010,14 +1156,14 @@ const ManageCourse = () => {
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
               <h3 className="text-lg font-medium">Add New Module</h3>
-              <button 
+              <button
                 onClick={() => setIsModuleModalOpen(false)}
                 className="text-gray-400 hover:text-gray-500"
               >
                 <FiX size={20} />
               </button>
             </div>
-            
+
             <div className="px-6 py-4">
               <div className="space-y-4">
                 <div>
@@ -1034,7 +1180,7 @@ const ManageCourse = () => {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Module Description
@@ -1050,7 +1196,7 @@ const ManageCourse = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
               <button
                 type="button"
@@ -1070,21 +1216,21 @@ const ManageCourse = () => {
           </div>
         </div>
       )}
-      
+
       {/* Material Modal */}
       {isMaterialModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
               <h3 className="text-lg font-medium">Add Course Material</h3>
-              <button 
+              <button
                 onClick={() => setIsMaterialModalOpen(false)}
                 className="text-gray-400 hover:text-gray-500"
               >
                 <FiX size={20} />
               </button>
             </div>
-            
+
             <div className="px-6 py-4">
               <div className="space-y-4">
                 <div>
@@ -1101,7 +1247,7 @@ const ManageCourse = () => {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Material Type
@@ -1117,8 +1263,8 @@ const ManageCourse = () => {
                     <option value="link">External Link</option>
                   </select>
                 </div>
-                
-                {newMaterial.type === 'link' ? (
+
+                {newMaterial.type === "link" ? (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       URL*
@@ -1140,7 +1286,7 @@ const ManageCourse = () => {
                     </label>
                     <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
                       <div className="space-y-1 text-center">
-                        {newMaterial.type === 'pdf' ? (
+                        {newMaterial.type === "pdf" ? (
                           <FiFile className="mx-auto h-12 w-12 text-gray-400" />
                         ) : (
                           <FiVideo className="mx-auto h-12 w-12 text-gray-400" />
@@ -1156,13 +1302,17 @@ const ManageCourse = () => {
                               name="file"
                               type="file"
                               className="sr-only"
-                              accept={newMaterial.type === 'pdf' ? ".pdf" : "video/*"}
+                              accept={
+                                newMaterial.type === "pdf" ? ".pdf" : "video/*"
+                              }
                               onChange={handleMaterialFileChange}
                             />
                           </label>
                         </div>
                         <p className="text-xs text-gray-500">
-                          {newMaterial.type === 'pdf' ? 'PDF up to 20MB' : 'MP4, WebM up to 100MB'}
+                          {newMaterial.type === "pdf"
+                            ? "PDF up to 20MB"
+                            : "MP4, WebM up to 100MB"}
                         </p>
                         {newMaterial.file && (
                           <p className="text-sm text-gray-700 font-medium mt-2">
@@ -1173,8 +1323,8 @@ const ManageCourse = () => {
                     </div>
                   </div>
                 )}
-                
-                {newMaterial.type === 'video' && (
+
+                {newMaterial.type === "video" && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Video Duration
@@ -1191,7 +1341,7 @@ const ManageCourse = () => {
                 )}
               </div>
             </div>
-            
+
             <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
               <button
                 type="button"
@@ -1211,7 +1361,7 @@ const ManageCourse = () => {
           </div>
         </div>
       )}
-      
+
       {/* Lesson Modal */}
       {isLessonModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -1220,14 +1370,14 @@ const ManageCourse = () => {
               <h3 className="text-lg font-medium">
                 {isEditingLesson ? "Edit Lesson" : "Add New Lesson"}
               </h3>
-              <button 
+              <button
                 onClick={() => setIsLessonModalOpen(false)}
                 className="text-gray-400 hover:text-gray-500"
               >
                 <FiX size={20} />
               </button>
             </div>
-            
+
             <div className="px-6 py-4">
               <div className="space-y-4">
                 <div>
@@ -1244,7 +1394,7 @@ const ManageCourse = () => {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     <div className="flex items-center">
@@ -1261,7 +1411,7 @@ const ManageCourse = () => {
                     placeholder="e.g. 15 min"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Lesson Description
@@ -1275,7 +1425,7 @@ const ManageCourse = () => {
                     placeholder="Describe this lesson"
                   ></textarea>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Lesson Material
@@ -1292,26 +1442,40 @@ const ManageCourse = () => {
                           onChange={handleLessonInputChange}
                           className="h-4 w-4 text-[#19a4db] focus:ring-[#19a4db] border-gray-300"
                         />
-                        <label htmlFor="material-none" className="ml-2 text-sm text-gray-700">
+                        <label
+                          htmlFor="material-none"
+                          className="ml-2 text-sm text-gray-700"
+                        >
                           No material
                         </label>
                       </div>
-                      
+
                       <div className="flex items-center">
                         <input
                           id="material-file"
                           name="materialType"
                           type="radio"
                           value="file"
-                          checked={newLesson.materialType === "pdf" || newLesson.materialType === "video"}
-                          onChange={() => setNewLesson(prev => ({ ...prev, materialType: "file" }))}
+                          checked={
+                            newLesson.materialType === "pdf" ||
+                            newLesson.materialType === "video"
+                          }
+                          onChange={() =>
+                            setNewLesson((prev) => ({
+                              ...prev,
+                              materialType: "file",
+                            }))
+                          }
                           className="h-4 w-4 text-[#19a4db] focus:ring-[#19a4db] border-gray-300"
                         />
-                        <label htmlFor="material-file" className="ml-2 text-sm text-gray-700">
+                        <label
+                          htmlFor="material-file"
+                          className="ml-2 text-sm text-gray-700"
+                        >
                           Upload file
                         </label>
                       </div>
-                      
+
                       <div className="flex items-center">
                         <input
                           id="material-link"
@@ -1322,13 +1486,18 @@ const ManageCourse = () => {
                           onChange={handleLessonInputChange}
                           className="h-4 w-4 text-[#19a4db] focus:ring-[#19a4db] border-gray-300"
                         />
-                        <label htmlFor="material-link" className="ml-2 text-sm text-gray-700">
+                        <label
+                          htmlFor="material-link"
+                          className="ml-2 text-sm text-gray-700"
+                        >
                           External link
                         </label>
                       </div>
                     </div>
-                    
-                    {(newLesson.materialType === "pdf" || newLesson.materialType === "video" || newLesson.materialType === "file") && (
+
+                    {(newLesson.materialType === "pdf" ||
+                      newLesson.materialType === "video" ||
+                      newLesson.materialType === "file") && (
                       <div className="mt-2">
                         <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
                           <div className="space-y-1 text-center">
@@ -1361,7 +1530,7 @@ const ManageCourse = () => {
                         </div>
                       </div>
                     )}
-                    
+
                     {newLesson.materialType === "link" && (
                       <div className="mt-2">
                         <input
@@ -1378,7 +1547,7 @@ const ManageCourse = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
               <button
                 type="button"
@@ -1402,4 +1571,4 @@ const ManageCourse = () => {
   );
 };
 
-export default ManageCourse; 
+export default ManageCourse;

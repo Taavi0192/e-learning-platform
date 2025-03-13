@@ -47,8 +47,7 @@ function App() {
         >
           <Route index element={<Dashboard teacherName="Dr. Jane Smith" courses={mockCourses} upcomingClasses={mockClasses} pendingAssignments={mockAssignments} />} />
           <Route path="courses" element={<Courses courses={mockCourses} />} />
-          <Route path="courses/manage" element={<CourseManagement />} />
-          {/* <Route path="courses/:courseId/manage" element={<CourseManagement />} /> */}
+          <Route path="courses/:courseId/manage" element={<CourseManagement />} /> 
           <Route path="students" element={<Students coursesList={mockCourses} />} />
           <Route path="assignments" element={<Assignments />} />
           <Route path="attendance" element={<Attendance />} />

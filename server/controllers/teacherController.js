@@ -9,7 +9,7 @@ const generateAccessToken = (user) => {
   return jwt.sign(
     { id: user._id, role: user.role },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "15m" }
+    { expiresIn: "7d" }
   );
 };
 
@@ -57,7 +57,7 @@ export const login = async (req, res) => {
     console.log(email, password);
 
     const teacher = await Teacher.findOne({ email });
-    console.log(teacher)
+    console.log(teacher);
 
     if (!teacher) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -124,64 +124,5 @@ export const refreshAccessToken = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error });
-  }
-};
-
-export const addCourse = async (req, res) => {
-  try {
-    const teacherId = req.user.id; // Assuming user ID is stored in req.user
-    const {
-      courseName,
-      courseCode,
-      maxStudents,
-      price,
-      duration,
-      difficulty,
-      category,
-      instructorName,
-      description,
-      thumbnail,
-    } = req.body;
-
-    // Validate required fields
-    if (
-      !courseName ||
-      !courseCode ||
-      !maxStudents ||
-      !price ||
-      !duration ||
-      !difficulty ||
-      !category ||
-      !instructorName
-    ) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    // Create a new course
-    const newCourse = await Course.create({
-      courseName,
-      courseCode,
-      maxStudents,
-      price,
-      duration,
-      difficulty,
-      category,
-      instructorName,
-      description,
-      thumbnail,
-    });
-
-    // Add the course to the teacher's list of courses
-    const teacher = await Teacher.findById(teacherId);
-    teacher.courses.push(newCourse._id);
-    await teacher.save();
-
-    return res
-      .status(201)
-      .json({ message: "Course added successfully", course: newCourse });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
   }
 };
