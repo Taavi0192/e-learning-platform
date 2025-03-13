@@ -1,6 +1,20 @@
 import React from "react";
 
-const Dashboard = ({ studentName, courses }) => {
+const Dashboard = ({ studentName = "Student", courses = [] }) => {
+  // Add default values for the props to prevent undefined errors
+  
+  // Add a safe check before sorting
+  const sortedCourses = courses && courses.length > 0 
+    ? [...courses].sort((a, b) => {
+        // Safely handle missing nextDate
+        if (!a.nextDate) return 1;
+        if (!b.nextDate) return -1;
+        return new Date(a.nextDate) - new Date(b.nextDate);
+      })
+    : [];
+  
+  const nextCourse = sortedCourses.length > 0 ? sortedCourses[0] : null;
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-sm p-6">
@@ -8,15 +22,32 @@ const Dashboard = ({ studentName, courses }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h3 className="text-lg font-semibold mb-3">Your Next Class</h3>
-            {courses.sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate))[0] && (
+            {nextCourse ? (
               <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-bold">{courses[0].title}</h4>
-                <p className="text-gray-600 mt-1">With {courses[0].instructor}</p>
-                <p className="text-[#19a4db] mt-3 font-medium">{courses[0].nextDate}, {courses[0].schedule.split(' ').slice(-2).join(' ')}</p>
-                <p className="text-gray-600 mt-1">Topic: {courses[0].nextLesson}</p>
+                <h4 className="font-bold">{nextCourse.title}</h4>
+                <p className="text-gray-600 mt-1">With {nextCourse.instructor}</p>
+                
+                {/* Safely display date information if available */}
+                {nextCourse.nextDate && (
+                  <p className="text-[#19a4db] mt-3 font-medium">
+                    {nextCourse.nextDate}
+                    {nextCourse.schedule && 
+                      `, ${nextCourse.schedule.split(' ').slice(-2).join(' ')}`
+                    }
+                  </p>
+                )}
+                
+                {nextCourse.nextLesson && (
+                  <p className="text-gray-600 mt-1">Topic: {nextCourse.nextLesson}</p>
+                )}
+                
                 <button className="mt-4 bg-[#19a4db] text-white px-4 py-2 rounded-lg text-sm font-medium">
                   Join Class
                 </button>
+              </div>
+            ) : (
+              <div className="border border-gray-200 rounded-lg p-4 text-center">
+                <p className="text-gray-500">No upcoming classes</p>
               </div>
             )}
           </div>
