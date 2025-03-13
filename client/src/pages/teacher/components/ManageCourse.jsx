@@ -58,7 +58,7 @@ const ManageCourse = () => {
     category: "",
     instructorName: "",
     description: "",
-    hasAssignments: false,
+    hasModules: false,
     hasQuizzes: false,
     certificateOffered: false,
     certificateTitle: "",
@@ -114,7 +114,7 @@ const ManageCourse = () => {
         category: "Web Development",
         instructorName: "Dr. Jane Smith",
         description: "Learn the fundamentals of React including components, state, and hooks.",
-        hasAssignments: true,
+        hasModules: true,
         hasQuizzes: true,
         certificateOffered: true,
         certificateTitle: "React Fundamentals Certificate",
@@ -403,14 +403,14 @@ const ManageCourse = () => {
                 Basic Info
               </button>
               <button
-                onClick={() => setActiveTab("assignments")}
+                onClick={() => setActiveTab("modules")}
                 className={`py-3 px-5 font-medium text-sm focus:outline-none ${
-                  activeTab === "assignments"
+                  activeTab === "modules"
                     ? "border-b-2 border-[#19a4db] text-[#19a4db]"
                     : "text-gray-500 hover:text-gray-700"
                 }`}
               >
-                Assignments
+                Modules
               </button>
               <button
                 onClick={() => setActiveTab("certificates")}
@@ -631,14 +631,14 @@ const ManageCourse = () => {
                     <div className="flex items-center">
                       <input
                         type="checkbox"
-                        id="hasAssignments"
-                        name="hasAssignments"
-                        checked={course.hasAssignments}
+                        id="hasModules"
+                        name="hasModules"
+                        checked={course.hasModules}
                         onChange={handleCheckChange}
                         className="h-4 w-4 text-[#19a4db] focus:ring-[#19a4db] border-gray-300 rounded"
                       />
-                      <label htmlFor="hasAssignments" className="ml-2 block text-sm text-gray-700">
-                        Includes Assignments
+                      <label htmlFor="hasModules" className="ml-2 block text-sm text-gray-700">
+                        Includes Modules
                       </label>
                     </div>
                     <div className="flex items-center">
@@ -672,8 +672,8 @@ const ManageCourse = () => {
               </div>
             )}
 
-            {/* Assignments Tab Content */}
-            {activeTab === "assignments" && (
+            {/* Modules Tab Content */}
+            {activeTab === "modules" && (
               <div>
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold">Course Content</h2>
