@@ -13,7 +13,7 @@ const Dashboard = ({ teacherName, courses, upcomingClasses, pendingAssignments }
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm text-blue-600 font-medium">Total Courses</p>
-                <h3 className="text-2xl font-bold text-gray-800 mt-1">{courses.length}</h3>
+                <h3 className="text-2xl font-bold text-gray-800 mt-1">{courses?.length || ""}</h3>
               </div>
               <div className="bg-blue-100 p-3 rounded-lg">
                 <FiBook className="h-6 w-6 text-blue-500" />
@@ -26,7 +26,8 @@ const Dashboard = ({ teacherName, courses, upcomingClasses, pendingAssignments }
               <div>
                 <p className="text-sm text-green-600 font-medium">Students</p>
                 <h3 className="text-2xl font-bold text-gray-800 mt-1">
-                  {courses.reduce((total, course) => total + course.studentsCount, 0)}
+                  {/* {courses.reduce((total, course) => total + course.studentsCount, 0)} */}
+                  {courses?.reduce((total, course) => total + course.studentsCount, 0)}
                 </h3>
               </div>
               <div className="bg-green-100 p-3 rounded-lg">
@@ -39,7 +40,7 @@ const Dashboard = ({ teacherName, courses, upcomingClasses, pendingAssignments }
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm text-yellow-600 font-medium">Assignments</p>
-                <h3 className="text-2xl font-bold text-gray-800 mt-1">{pendingAssignments.length}</h3>
+                <h3 className="text-2xl font-bold text-gray-800 mt-1">{pendingAssignments?.length || ""}</h3>
               </div>
               <div className="bg-yellow-100 p-3 rounded-lg">
                 <FiClipboard className="h-6 w-6 text-yellow-500" />
@@ -52,7 +53,7 @@ const Dashboard = ({ teacherName, courses, upcomingClasses, pendingAssignments }
               <div>
                 <p className="text-sm text-purple-600 font-medium">Classes Today</p>
                 <h3 className="text-2xl font-bold text-gray-800 mt-1">
-                  {upcomingClasses.filter(c => {
+                  {upcomingClasses?.filter(c => {
                     const today = new Date();
                     const classDate = new Date(c.date);
                     return classDate.toDateString() === today.toDateString();
@@ -71,7 +72,7 @@ const Dashboard = ({ teacherName, courses, upcomingClasses, pendingAssignments }
           <div>
             <h3 className="text-lg font-semibold mb-4">Upcoming Classes</h3>
             <div className="space-y-3">
-              {upcomingClasses.slice(0, 3).map((cls, index) => (
+              {upcomingClasses?.slice(0, 3).map((cls, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-start">
                     <div>
@@ -93,7 +94,7 @@ const Dashboard = ({ teacherName, courses, upcomingClasses, pendingAssignments }
                   </div>
                 </div>
               ))}
-              {upcomingClasses.length > 3 && (
+              {upcomingClasses?.length > 3 && (
                 <button className="w-full text-center text-sm text-[#19a4db] hover:text-[#1582af] py-2">
                   View All Classes
                 </button>
@@ -104,7 +105,7 @@ const Dashboard = ({ teacherName, courses, upcomingClasses, pendingAssignments }
           <div>
             <h3 className="text-lg font-semibold mb-4">Pending Assignments</h3>
             <div className="space-y-3">
-              {pendingAssignments.slice(0, 3).map((assignment, index) => (
+              {pendingAssignments?.slice(0, 3).map((assignment, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-start">
                     <div>
@@ -127,7 +128,7 @@ const Dashboard = ({ teacherName, courses, upcomingClasses, pendingAssignments }
                   </div>
                 </div>
               ))}
-              {pendingAssignments.length > 3 && (
+              {pendingAssignments?.length > 3 && (
                 <button className="w-full text-center text-sm text-[#19a4db] hover:text-[#1582af] py-2">
                   View All Assignments
                 </button>
@@ -146,7 +147,7 @@ const Dashboard = ({ teacherName, courses, upcomingClasses, pendingAssignments }
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course, index) => (
+          {courses?.map((course, index) => (
             <div key={index} className="border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow">
               <h3 className="font-bold text-lg">{course.name}</h3>
               <p className="text-gray-600 mt-1">Code: {course.code}</p>

@@ -133,29 +133,6 @@ const Sidebar = ({ isSidebarOpen, navigate }) => {
             Certifications
           </Link>
 
-          <Link
-            to="/dashboard/users"
-            className={`flex items-center px-4 py-3 text-sm rounded-lg ${
-              isActive("/users")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiShield className="mr-3 h-5 w-5" />
-            User Access Control
-          </Link>
-
-          <Link
-            to="/dashboard/reports"
-            className={`flex items-center px-4 py-3 text-sm rounded-lg ${
-              isActive("/reports")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiPieChart className="mr-3 h-5 w-5" />
-            Reports & Analytics
-          </Link>
 
           <Link
             to="/dashboard/settings"

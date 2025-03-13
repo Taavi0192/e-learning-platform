@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
   const signUp = async ({ username, email, password, role }) => {
     try {
       const api = getApiInstance(role);
-      const res = await api.post(`/signup`, {
+      const res = await api.post('/signup', {
         username,
         email,
         password,
@@ -71,10 +71,11 @@ export const AuthProvider = ({ children }) => {
   const login = async ({ email, password, role }) => {
     try {
       const api = getApiInstance(role);
-      const res = await api.post(`/login`, { email, password });
+      const res = await api.post('/login', { email, password });
 
+      console.log(res)
       const token = res.data.accessToken;
-      const userData = res.data[role]; // Dynamically get user info
+      const userData = res.data[role]; 
 
       setAccessToken(token);
       setUserName(userData.username);
@@ -87,6 +88,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("role", role);
       localStorage.setItem("userName", userData.username);
     } catch (error) {
+      console.log(error)
       throw new Error(error.response?.data?.message || "Error logging in");
     }
   };
@@ -108,7 +110,7 @@ export const AuthProvider = ({ children }) => {
       setUserName(null);
       localStorage.clear();
 
-      await api.post(`/logout`);
+      await api.post('/logout');
       navigate("/login");
     } catch (error) {
       console.error(
@@ -156,7 +158,7 @@ export const AuthProvider = ({ children }) => {
             if (newAccessToken) {
               error.config.headers[
                 "Authorization"
-              ] = `Bearer ${newAccessToken}`;
+              ] =' Bearer ${newAccessToken}';
               return api(error.config);
             }
           } catch (refreshError) {
