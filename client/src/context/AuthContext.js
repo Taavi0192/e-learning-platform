@@ -99,6 +99,8 @@ export const AuthProvider = ({ children }) => {
 
       const api = getApiInstance(userRole);
 
+      console.log(userRole);
+
       // Clear state and storage
       setAccessToken(null);
       setUser(null);

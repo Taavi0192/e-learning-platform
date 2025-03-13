@@ -61,9 +61,11 @@ const SignUp = () => {
   };
 
   const handleGoogleSignup = () => {
-    toast.info("Redirecting to Google sign up...");
-    console.log("Signing up with Google...");
-    navigate("/student-dashboard");
+    // Store the current role in localStorage before redirecting
+    localStorage.setItem("pendingGoogleRole", formData.role);
+
+    // Redirect to the backend Google OAuth endpoint with role as query parameter
+    window.location.href = `http://localhost:5000/api/auth/google?role=${formData.role}`;
   };
 
   const togglePasswordVisibility = () => {
