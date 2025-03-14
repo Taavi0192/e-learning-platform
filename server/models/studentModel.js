@@ -33,6 +33,12 @@ const studentSchema = new mongoose.Schema(
         return !this.googleId; // Password is required only if googleId is not present
       },
     },
+    enrolledCourses: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Course",
+      },
+    ],
   },
   { timestamps: true }
 );

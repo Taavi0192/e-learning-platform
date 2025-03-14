@@ -5,6 +5,9 @@ import {
   addLesson,
   getCoursesByTeacher,
   manageCourse,
+  getAllCourses,
+  enrollInCourse,
+  getEnrolledCourses,
 } from "../controllers/courseController.js";
 import { verifyAccessToken } from "../middlewares/authMiddleware.js";
 import upload from "../config/multerConfig.js";
@@ -30,5 +33,8 @@ router
   .route("/:courseId/manage")
   .get(verifyAccessToken, manageCourse)
   .put(verifyAccessToken, manageCourse);
+router.get("/getallcourses", verifyAccessToken, getAllCourses);
+router.post("/enroll", verifyAccessToken, enrollInCourse);
+router.get("/enrolled", verifyAccessToken, getEnrolledCourses);
 
 export default router;

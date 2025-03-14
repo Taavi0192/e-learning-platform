@@ -7,7 +7,7 @@ const generateAccessToken = (user) => {
   return jwt.sign(
     { id: user._id, role: user.role },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "15m" }
+    { expiresIn: "7d" }
   );
 };
 
@@ -20,7 +20,7 @@ const generateRefreshToken = (user) => {
 export const signUp = async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
-    console.log(username)
+    console.log(username);
     if (!username || !email || !password || !role) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -78,7 +78,7 @@ export const login = async (req, res) => {
       sameSite: "Strict",
     });
 
-    return res.json({ message: "Login successful", accessToken , student });
+    return res.json({ message: "Login successful", accessToken, student });
   } catch (error) {
     return res
       .status(500)

@@ -208,3 +208,75 @@ export const manageCourse = async (req, res) => {
       .json({ message: "Server error", error: error.message });
   }
 };
+
+export const getAllCourses = async (req, res) => {
+  try {
+    const studentId = req.user.id; // Assuming user ID is stored in req.user
+
+    // Fetch the student's enrolled courses
+    const student = await Student.findById(studentId);
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Get all courses
+    const allCourses = await Course.find();
+
+    // Filter out courses that the student is already enrolled in
+    const availableCourses = allCourses.filter(
+      (course) => !student.enrolledCourses.includes(course._id)
+    );
+
+    return res.status(200).json({ courses: availableCourses });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
+export const enrollInCourse = async (req, res) => {
+  try {
+    const studentId = req.user.id; // Assuming user ID is stored in req.user
+    const { courseId } = req.body;
+
+    const student = await Student.findById(studentId);
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    if (student.enrolledCourses.includes(courseId)) {
+      return res
+        .status(400)
+        .json({ message: "Already enrolled in this course" });
+    }
+
+    student.enrolledCourses.push(courseId);
+    await student.save();
+
+    return res.status(200).json({ message: "Enrolled in course successfully" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
+export const getEnrolledCourses = async (req, res) => {
+  try {
+    const studentId = req.user.id; // Assuming user ID is stored in req.user
+
+    const student = await Student.findById(studentId).populate(
+      "enrolledCourses"
+    );
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    return res.status(200).json({ courses: student.enrolledCourses });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
