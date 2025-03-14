@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import { FiSearch, FiFilter, FiMail, FiUserCheck, FiUserX, FiDownload, FiMoreVertical } from "react-icons/fi";
+import { FiSearch, FiFilter, FiMail, FiUserCheck, FiUserX, FiDownload, FiMoreVertical, FiX } from "react-icons/fi";
 
 const Students = ({ coursesList }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("all");
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [emailMessage, setEmailMessage] = useState("");
   
   // Mock student data - would come from API in real app
   const students = [
@@ -66,16 +69,39 @@ const Students = ({ coursesList }) => {
     return matchesSearch && matchesCourse;
   });
 
+  // Handle opening the email modal
+  const handleOpenEmailModal = (student) => {
+    setSelectedStudent(student);
+    setEmailModalOpen(true);
+  };
+
+  // Handle sending the email
+  const handleSendEmail = (e) => {
+    e.preventDefault();
+    
+    // In a real app, you would call an API to send the email
+    console.log(`Sending email to ${selectedStudent.name} (${selectedStudent.email})`);
+    console.log(`Message: ${emailMessage}`);
+    
+    // Show success message (in a real app, this would happen after API success)
+    alert(`Email sent to ${selectedStudent.name}`);
+    
+    // Close modal and reset form
+    setEmailModalOpen(false);
+    setEmailMessage("");
+    setSelectedStudent(null);
+  };
+
   return (
     <div className="space-y-6 w-full">
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex flex-wrap justify-between items-center mb-6">
           <h2 className="text-xl font-bold">Students</h2>
           <div className="flex mt-4 sm:mt-0 space-x-2">
-            <button className="flex items-center px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm">
+            {/* <button className="flex items-center px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm">
               <FiDownload className="mr-2" />
               Export Data
-            </button>
+            </button> */}
           </div>
         </div>
         
@@ -201,7 +227,10 @@ const Students = ({ coursesList }) => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex space-x-2 justify-end">
-                      <button className="text-gray-400 hover:text-[#19a4db]">
+                      <button 
+                        className="text-gray-400 hover:text-[#19a4db]"
+                        onClick={() => handleOpenEmailModal(student)}
+                      >
                         <FiMail size={18} />
                       </button>
                       <button className="text-gray-400 hover:text-[#19a4db]">
@@ -223,6 +252,78 @@ const Students = ({ coursesList }) => {
           </table>
         </div>
       </div>
+
+      {/* Email Modal */}
+      {emailModalOpen && selectedStudent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
+            <button 
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              onClick={() => setEmailModalOpen(false)}
+            >
+              <FiX size={24} />
+            </button>
+            
+            <h3 className="text-xl font-bold mb-4">Send Email</h3>
+            
+            <div className="mb-4">
+              <p className="text-sm text-gray-500">To:</p>
+              <div className="flex items-center mt-1">
+                <div className="h-8 w-8 rounded-full bg-[#19a4db] flex items-center justify-center text-white font-medium text-sm">
+                  {selectedStudent.name.charAt(0)}
+                </div>
+                <div className="ml-2">
+                  <p className="text-sm font-medium">{selectedStudent.name}</p>
+                  <p className="text-xs text-gray-500">{selectedStudent.email}</p>
+                </div>
+              </div>
+            </div>
+            
+            <form onSubmit={handleSendEmail}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Subject
+                </label>
+                <input 
+                  type="text" 
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#19a4db]"
+                  placeholder="Enter email subject"
+                  required
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Message
+                </label>
+                <textarea 
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#19a4db] min-h-[120px]"
+                  placeholder="Type your message here..."
+                  value={emailMessage}
+                  onChange={(e) => setEmailMessage(e.target.value)}
+                  required
+                ></textarea>
+              </div>
+              
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md text-sm"
+                  onClick={() => setEmailModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-[#19a4db] text-white rounded-md text-sm"
+                >
+                  Send Email
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

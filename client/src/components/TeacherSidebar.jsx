@@ -86,7 +86,7 @@ const TeacherSidebar = () => {
             Assignments
           </Link>
 
-          <Link
+          {/* <Link
             to="/teacher-dashboard/attendance"
             className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
               isActive("/teacher-dashboard/attendance")
@@ -96,7 +96,7 @@ const TeacherSidebar = () => {
           >
             <FiCalendar className="mr-3 h-5 w-5" />
             Attendance
-          </Link>
+          </Link> */}
 
           <Link
             to="/teacher-dashboard/grades"
@@ -110,7 +110,7 @@ const TeacherSidebar = () => {
             Grades
           </Link>
 
-          <Link
+          {/* <Link
             to="/teacher-dashboard/materials"
             className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
               isActive("/teacher-dashboard/materials")
@@ -120,7 +120,7 @@ const TeacherSidebar = () => {
           >
             <FiFileText className="mr-3 h-5 w-5" />
             Course Materials
-          </Link>
+          </Link> */}
 
           <Link
             to="/teacher-dashboard/settings"
