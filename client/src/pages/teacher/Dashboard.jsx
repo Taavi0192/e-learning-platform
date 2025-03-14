@@ -51,7 +51,7 @@ const Dashboard = ({ teacherName, courses, upcomingClasses, pendingAssignments }
           <div className="bg-purple-50 rounded-xl p-6">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm text-purple-600 font-medium">Classes Today</p>
+                <p className="text-sm text-purple-600 font-medium">3 Upcoming Courses</p>
                 <h3 className="text-2xl font-bold text-gray-800 mt-1">
                   {upcomingClasses?.filter(c => {
                     const today = new Date();

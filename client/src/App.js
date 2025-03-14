@@ -22,6 +22,7 @@ import Materials from "./pages/teacher/Materials";
 import Settings from "./pages/teacher/Settings";
 
 // Student Components
+// import StudentDashboard from "./pages/student/Dashboard";
 import StudentCourses from "./pages/student/Courses";
 import NewCourses from "./pages/student/NewCourses";
 import Progress from "./pages/student/Progress";
@@ -50,7 +51,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<StudentCourses />} />
+          <Route index element={<Dashboard />} />
           <Route path="courses" element={<StudentCourses />} />
           <Route path="new-courses" element={<NewCourses />} />
           <Route path="progress" element={<Progress />} />
@@ -58,7 +59,7 @@ function App() {
           <Route path="attendance" element={<StudentAttendance />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="support" element={<Support />} />
-          <Route path="courses/materials" element={<CourseMaterials />} /> 
+          <Route path="courses/materials" element={<CourseMaterials />} />
         </Route>
 
         {/* Protected Teacher Routes */}

@@ -104,7 +104,7 @@ const Courses = () => {
                   </button>
                   <button
                     className="px-4 py-2 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium"
-                    onClick={() => handleViewMaterials()}
+                    onClick={() => handleViewMaterials(course)}
                   >
                     View Materials
                   </button>
