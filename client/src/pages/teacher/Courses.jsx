@@ -50,39 +50,6 @@ const Courses = () => {
           (course) => course.status.toLowerCase() === activeFilter
         );
 
-  useEffect(() => {
-    // Mock data for teacher courses - in a real app, this would come from an API
-    const mockCourses = [
-      {
-        id: 1,
-        title: "Introduction to React",
-        students: 42,
-        level: "Beginner",
-        lastUpdated: "2023-05-15",
-        status: "Active",
-      },
-      {
-        id: 2,
-        title: "Advanced JavaScript",
-        students: 28,
-        level: "Advanced",
-        lastUpdated: "2023-04-20",
-        status: "Active",
-      },
-      {
-        id: 3,
-        title: "UX/UI Design Fundamentals",
-        students: 36,
-        level: "Intermediate",
-        lastUpdated: "2023-05-01",
-        status: "Active",
-      }
-    ];
-    
-    setCourses(mockCourses);
-    setLoading(false);
-  }, []);
-
   const handleAddCourse = (courseData) => {
     // Here you would typically send the data to your API
     console.log("Form submitted:", courseData);
