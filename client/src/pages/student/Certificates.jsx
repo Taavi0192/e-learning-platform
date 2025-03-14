@@ -1,78 +1,124 @@
 import React from "react";
-import { FiDownload, FiShare2, FiAward } from "react-icons/fi";
+import { FiDownload, FiShare2 } from "react-icons/fi";
 
-const Certificates = ({ certificates }) => {
+const Certificates = () => {
+  // Mock certificates data
+  const certificates = [
+    {
+      id: 1,
+      course: "HTML & CSS Foundations",
+      issueDate: "Jan 15, 2023",
+      status: "Available",
+      instructor: "Emma Wilson",
+      credentialID: "CERT-HTML-12345",
+      completionDate: "Jan 12, 2023",
+    },
+    {
+      id: 2,
+      course: "JavaScript Basics",
+      issueDate: "Mar 22, 2023",
+      status: "Available",
+      instructor: "David Brown",
+      credentialID: "CERT-JS-67890",
+      completionDate: "Mar 20, 2023",
+    },
+    {
+      id: 3,
+      course: "React Fundamentals",
+      issueDate: "Pending",
+      status: "Pending",
+      instructor: "Sarah Johnson",
+      credentialID: "CERT-REACT-PEND",
+      completionDate: "In progress",
+      progress: 85,
+    },
+  ];
+
   return (
     <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-gray-800">My Certificates</h1>
+      
       <div className="bg-white rounded-xl shadow-sm p-6">
-        <h2 className="text-xl font-bold mb-6">My Certificates</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-semibold">Earned Certificates</h2>
+          <div className="flex space-x-2">
+            <select className="px-3 py-2 border border-gray-300 rounded-md text-sm">
+              <option>All Certificates</option>
+              <option>Available</option>
+              <option>Pending</option>
+            </select>
+          </div>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
           {certificates.map(certificate => (
-            <div key={certificate.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start">
+            <div 
+              key={certificate.id} 
+              className="border border-gray-200 rounded-lg overflow-hidden"
+            >
+              <div className="p-5 flex flex-col md:flex-row justify-between items-start md:items-center">
                 <div>
-                  <h3 className="font-bold text-lg">{certificate.course}</h3>
-                  <p className="text-gray-600 mt-1">Issued: {certificate.issueDate}</p>
-                  <div className="mt-2">
-                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                      {certificate.status}
-                    </span>
+                  <h3 className="font-semibold text-lg">{certificate.course}</h3>
+                  <p className="text-gray-600 mt-1">Instructor: {certificate.instructor}</p>
+                  <div className="flex mt-2 space-x-4">
+                    <p className="text-sm text-gray-500">
+                      ID: {certificate.credentialID}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Completed: {certificate.completionDate}
+                    </p>
                   </div>
                 </div>
-                <div className="bg-blue-50 p-3 rounded-xl">
-                  <FiAward className="text-[#19a4db] w-8 h-8" />
+                
+                <div className="mt-4 md:mt-0 flex flex-col items-start md:items-end">
+                  <span className={`text-sm font-medium px-3 py-1 rounded-full ${
+                    certificate.status === "Available" 
+                      ? "bg-green-100 text-green-800" 
+                      : "bg-yellow-100 text-yellow-800"
+                  }`}>
+                    {certificate.status}
+                  </span>
+                  
+                  {certificate.status === "Available" ? (
+                    <div className="mt-3 flex space-x-2">
+                      <button className="flex items-center text-sm bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600">
+                        <FiDownload className="mr-1" />
+                        Download
+                      </button>
+                      <button className="flex items-center text-sm border border-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-gray-50">
+                        <FiShare2 className="mr-1" />
+                        Share
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mt-3 w-full md:w-64">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Course progress</span>
+                        <span>{certificate.progress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-yellow-500 h-2 rounded-full" 
+                          style={{ width: `${certificate.progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-              
-              <div className="mt-6 flex space-x-2">
-                <button className="flex items-center px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm font-medium">
-                  <FiDownload className="mr-2" />
-                  Download
-                </button>
-                <button className="flex items-center px-4 py-2 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium">
-                  <FiShare2 className="mr-2" />
-                  Share
-                </button>
               </div>
             </div>
           ))}
-          
-          {certificates.length === 0 && (
-            <div className="col-span-2 text-center py-12 bg-gray-50 rounded-xl">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FiAward className="text-gray-400 w-8 h-8" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-800 mb-1">No Certificates Yet</h3>
-              <p className="text-gray-500 mb-4">
-                Complete courses to earn your first certificate.
-              </p>
-              <button className="px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm font-medium">
-                Browse Courses
-              </button>
-            </div>
-          )}
         </div>
         
-        {certificates.length > 0 && (
-          <div className="mt-8 border-t border-gray-100 pt-6">
-            <h3 className="font-semibold text-lg mb-4">Available Certificates</h3>
-            <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-4">
-              <div className="flex items-start">
-                <div className="bg-yellow-100 p-2 rounded-lg mr-4">
-                  <FiAward className="text-yellow-600 w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="font-medium text-yellow-800">JavaScript Advanced Certificate</h4>
-                  <p className="text-yellow-700 text-sm mt-1">
-                    You've completed 85% of the Advanced JavaScript course. Complete the final project to earn this certificate.
-                  </p>
-                  <button className="mt-3 px-4 py-2 bg-yellow-200 text-yellow-800 rounded-lg text-sm font-medium">
-                    Continue Course
-                  </button>
-                </div>
-              </div>
+        {certificates.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 mb-3">
+              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
             </div>
+            <h3 className="text-lg font-medium text-gray-900">No certificates yet</h3>
+            <p className="mt-1 text-gray-500">Complete a course to earn your first certificate!</p>
           </div>
         )}
       </div>

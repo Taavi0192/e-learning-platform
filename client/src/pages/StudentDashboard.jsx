@@ -1,52 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 import StudentHeader from "../components/StudentHeader";
 import StudentSidebar from "../components/StudentSidebar";
 import Dashboard from "./student/Dashboard";
 import Courses from "./student/Courses";
+import NewCourses from "./student/NewCourses";
 import Progress from "./student/Progress";
 import Certificates from "./student/Certificates";
 import Attendance from "./student/Attendance";
 import Notifications from "./student/Notifications";
 import Support from "./student/Support";
-import { FiAward } from "react-icons/fi";
 
 const StudentDashboard = () => {
-  const [activeTab, setActiveTab] = useState("dashboard");
   const userName = localStorage.getItem("userName");
 
-  // Mock data - would come from API in real app
-  const studentName = userName;
-
-  const courses = [
-    {
-      id: 1,
-      title: "Introduction to React",
-      instructor: "Sarah Johnson",
-      schedule: "Mon, Wed 2:00 PM - 4:00 PM",
-      progress: 65,
-      nextLesson: "Component Lifecycle",
-      nextDate: "Wed, May 15, 2023",
-    },
-    {
-      id: 2,
-      title: "Advanced JavaScript",
-      instructor: "Michael Chen",
-      schedule: "Tue, Thu 10:00 AM - 12:00 PM",
-      progress: 40,
-      nextLesson: "Promises and Async/Await",
-      nextDate: "Tue, May 14, 2023",
-    },
-    {
-      id: 3,
-      title: "UX/UI Design Fundamentals",
-      instructor: "Priya Sharma",
-      schedule: "Fri 1:00 PM - 5:00 PM",
-      progress: 85,
-      nextLesson: "User Testing Methods",
-      nextDate: "Fri, May 17, 2023",
-    },
-  ];
-
+  // Mock notifications to avoid undefined issues
   const notifications = [
     {
       id: 1,
@@ -60,65 +28,26 @@ const StudentDashboard = () => {
       message: "New lecture notes uploaded for JavaScript course",
       time: "Yesterday",
     },
-    {
-      id: 3,
-      title: "Instructor Announcement",
-      message: "No class on Friday due to holiday",
-      time: "2 days ago",
-    },
   ];
-
-  const certificates = [
-    {
-      id: 1,
-      course: "HTML & CSS Foundations",
-      issueDate: "Jan 15, 2023",
-      status: "Available",
-    },
-    {
-      id: 2,
-      course: "JavaScript Basics",
-      issueDate: "Mar 22, 2023",
-      status: "Available",
-    },
-  ];
-
-  const attendanceStats = {
-    overall: 92,
-    recentClasses: [
-      { date: "May 10", status: "Present" },
-      { date: "May 8", status: "Present" },
-      { date: "May 6", status: "Absent" },
-      { date: "May 3", status: "Present" },
-      { date: "May 1", status: "Present" },
-      { date: "Apr 28", status: "Present" },
-      { date: "Apr 26", status: "Excused" },
-    ],
-  };
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <StudentHeader notifications={notifications} studentName={studentName} />
+      <StudentHeader studentName={userName} notifications={notifications} />
 
       <div className="pt-16 flex">
-        <StudentSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <StudentSidebar />
 
         <main className="flex-1 p-6 overflow-x-hidden">
-          {activeTab === "dashboard" && (
-            <Dashboard studentName={studentName} courses={courses} />
-          )}
-          {activeTab === "courses" && <Courses courses={courses} />}
-          {activeTab === "progress" && <Progress courses={courses} />}
-          {activeTab === "certificates" && (
-            <Certificates certificates={certificates} />
-          )}
-          {activeTab === "attendance" && (
-            <Attendance attendanceStats={attendanceStats} />
-          )}
-          {activeTab === "notifications" && (
-            <Notifications notifications={notifications} />
-          )}
-          {activeTab === "support" && <Support />}
+          <Routes>
+            <Route path="/" element={<Dashboard studentName={userName} />} />
+            <Route path="courses" element={<Courses />} />
+            <Route path="new-courses" element={<NewCourses />} />
+            <Route path="progress" element={<Progress />} />
+            <Route path="certificates" element={<Certificates />} />
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="notifications" element={<Notifications />} />
+            <Route path="support" element={<Support />} />
+          </Routes>
         </main>
       </div>
     </div>

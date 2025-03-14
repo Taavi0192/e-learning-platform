@@ -10,6 +10,7 @@ import passport from "passport";
 import session from "express-session";
 import courseRoutes from "./routes/courseRoutes.js";
 import path from "path";
+import assignmentRoutes from "./routes/assignmentRoutes.js";
 
 const app = express();
 
@@ -56,5 +57,6 @@ app.use("/api/adminRoutes", adminRoutes);
 app.use("/api/resetpassword", passwordReset);
 app.use("/api/googleAuth", googleAuthRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/assignments", assignmentRoutes);
 
 export default app;

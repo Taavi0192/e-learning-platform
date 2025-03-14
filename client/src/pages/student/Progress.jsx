@@ -1,98 +1,173 @@
 import React from "react";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  LineChart,
+  Line
+} from "recharts";
 
-const Progress = ({ courses }) => {
+const Progress = () => {
+  // Mock data for course progress
+  const courses = [
+    {
+      id: 1,
+      title: "Introduction to React",
+      instructor: "Sarah Johnson",
+      progress: 65,
+      score: 78,
+      completed: 12,
+      total: 20
+    },
+    {
+      id: 2,
+      title: "Advanced JavaScript",
+      instructor: "Michael Chen",
+      progress: 40,
+      score: 85,
+      completed: 8,
+      total: 15
+    },
+    {
+      id: 3,
+      title: "UX/UI Design Fundamentals",
+      instructor: "Priya Sharma",
+      progress: 85,
+      score: 92,
+      completed: 15,
+      total: 18
+    },
+  ];
+
   // Calculate overall progress
-  const overallProgress = 
-    courses.reduce((sum, course) => sum + course.progress, 0) / courses.length;
-  
+  const totalCompleted = courses.reduce((sum, course) => sum + course.completed, 0);
+  const totalLessons = courses.reduce((sum, course) => sum + course.total, 0);
+  const overallProgress = Math.round((totalCompleted / totalLessons) * 100);
+
+  // Generate weekly activity data
+  const weeklyActivity = [
+    { day: "Mon", hours: 2.5 },
+    { day: "Tue", hours: 1.8 },
+    { day: "Wed", hours: 3.2 },
+    { day: "Thu", hours: 2.0 },
+    { day: "Fri", hours: 1.5 },
+    { day: "Sat", hours: 0.5 },
+    { day: "Sun", hours: 1.0 },
+  ];
+
+  // Course completion data for the chart
+  const courseChartData = courses.map(course => ({
+    name: course.title.length > 15 ? course.title.substring(0, 15) + "..." : course.title,
+    progress: course.progress
+  }));
+
   return (
     <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-gray-800">Learning Progress</h1>
+      
+      {/* Overall progress card */}
       <div className="bg-white rounded-xl shadow-sm p-6">
-        <h2 className="text-xl font-bold mb-6">Learning Progress</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="border border-gray-200 rounded-xl p-6">
-            <h3 className="font-semibold text-lg mb-4">Overall Progress</h3>
-            <div className="relative pt-1">
-              <div className="flex mb-2 items-center justify-between">
-                <div>
-                  <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
-                    All Courses
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs font-semibold inline-block text-blue-600">
-                    {Math.round(overallProgress)}%
-                  </span>
-                </div>
-              </div>
-              <div className="overflow-hidden h-4 mb-4 text-xs flex rounded-full bg-blue-100">
-                <div style={{ width: `${overallProgress}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-[#19a4db]"></div>
-              </div>
-            </div>
-            
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <div className="bg-green-50 rounded-lg p-3">
-                <h4 className="text-green-800 font-medium text-sm">Completed</h4>
-                <p className="text-2xl font-bold text-green-600">1</p>
-                <p className="text-xs text-green-700">course</p>
-              </div>
-              <div className="bg-blue-50 rounded-lg p-3">
-                <h4 className="text-blue-800 font-medium text-sm">In Progress</h4>
-                <p className="text-2xl font-bold text-blue-600">{courses.length}</p>
-                <p className="text-xs text-blue-700">courses</p>
-              </div>
+        <h2 className="text-lg font-semibold mb-4">Overall Progress</h2>
+        <div className="flex items-center">
+          <div className="relative w-24 h-24">
+            <svg className="w-full h-full" viewBox="0 0 36 36">
+              <path
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                fill="none"
+                stroke="#eeeeee"
+                strokeWidth="3"
+              />
+              <path
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                fill="none"
+                stroke="#4299e1"
+                strokeWidth="3"
+                strokeDasharray={`${overallProgress}, 100`}
+              />
+            </svg>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl font-bold">
+              {overallProgress}%
             </div>
           </div>
-          
-          <div className="border border-gray-200 rounded-xl p-6">
-            <h3 className="font-semibold text-lg mb-4">Learning Time</h3>
-            <div className="flex items-center justify-center h-40">
-              <div className="text-center">
-                <p className="text-4xl font-bold text-gray-800">42h</p>
-                <p className="text-gray-500 mt-1">Total learning time</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-2 mt-4">
-              <div className="bg-gray-50 rounded-lg p-2 text-center">
-                <p className="text-lg font-semibold text-gray-800">12h</p>
-                <p className="text-xs text-gray-500">This week</p>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-2 text-center">
-                <p className="text-lg font-semibold text-gray-800">28h</p>
-                <p className="text-xs text-gray-500">This month</p>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-2 text-center">
-                <p className="text-lg font-semibold text-gray-800">104</p>
-                <p className="text-xs text-gray-500">Activities</p>
-              </div>
-            </div>
+          <div className="ml-6">
+            <p className="text-sm text-gray-600">
+              You've completed {totalCompleted} of {totalLessons} lessons
+            </p>
+            <p className="text-sm text-gray-600 mt-1">
+              Keep up the good work!
+            </p>
           </div>
         </div>
-        
-        <h3 className="font-semibold text-lg mb-4">Course Progress</h3>
-        <div className="space-y-4">
+      </div>
+      
+      {/* Course progress */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <h2 className="text-lg font-semibold mb-4">Course Progress</h2>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={courseChartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis domain={[0, 100]} />
+              <Tooltip />
+              <Bar dataKey="progress" fill="#4299e1" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      
+      {/* Weekly activity */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <h2 className="text-lg font-semibold mb-4">Weekly Activity</h2>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={weeklyActivity}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="hours"
+                stroke="#4299e1"
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      
+      {/* Individual course progress details */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <h2 className="text-lg font-semibold mb-4">Course Details</h2>
+        <div className="space-y-6">
           {courses.map(course => (
-            <div key={course.id} className="border border-gray-100 rounded-lg p-4">
-              <div className="flex justify-between mb-2">
-                <h4 className="font-medium">{course.title}</h4>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  course.progress < 30 ? 'bg-red-100 text-red-800' : 
-                  course.progress < 70 ? 'bg-yellow-100 text-yellow-800' : 
-                  'bg-green-100 text-green-800'
-                }`}>
+            <div key={course.id} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-medium">{course.title}</h3>
+                <span className="text-sm font-medium text-blue-500">
                   {course.progress}% Complete
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-[#19a4db] h-2 rounded-full" 
+              <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                <div
+                  className="bg-blue-500 h-2 rounded-full"
                   style={{ width: `${course.progress}%` }}
                 ></div>
               </div>
-              <div className="mt-2 flex justify-between text-xs text-gray-500">
-                <span>Started: April 5, 2023</span>
-                <span>Last activity: 2 days ago</span>
+              <div className="flex justify-between text-sm text-gray-500">
+                <span>{course.completed} of {course.total} lessons completed</span>
+                <span>Score: {course.score}%</span>
               </div>
             </div>
           ))}
