@@ -2,13 +2,14 @@ import Student from "../models/studentModel.js";
 import Teacher from "../models/teacherModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import Course from "../models/courseModel.js";
 
 // Generate Tokens
 const generateAccessToken = (user) => {
   return jwt.sign(
     { id: user._id, role: user.role },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "15m" }
+    { expiresIn: "7d" }
   );
 };
 
@@ -53,10 +54,10 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log(email, password); 
+    console.log(email, password);
 
     const teacher = await Teacher.findOne({ email });
-    console.log(teacher)
+    console.log(teacher);
 
     if (!teacher) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -82,7 +83,7 @@ export const login = async (req, res) => {
       sameSite: "Strict",
     });
 
-    return res.json({ message: "Login successful", accessToken , teacher });
+    return res.json({ message: "Login successful", accessToken, teacher });
   } catch (error) {
     return res
       .status(500)

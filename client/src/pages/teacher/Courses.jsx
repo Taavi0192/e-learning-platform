@@ -1,65 +1,67 @@
 import React, { useState, useEffect } from "react";
-import { FiUsers, FiCalendar, FiEdit, FiTrash2, FiPlus, FiBook } from "react-icons/fi";
-import AddCourseModal from "./components/AddCourseModal"; 
-import { useNavigate, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import {
+  FiUsers,
+  FiCalendar,
+  FiEdit,
+  FiTrash2,
+  FiPlus,
+  FiBook,
+} from "react-icons/fi";
+import AddCourseModal from "./components/AddCourseModal";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Courses = () => {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const filteredCourses = activeFilter === "all" 
-    ? courses 
-    : courses.filter(course => course.status.toLowerCase() === activeFilter);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Mock data for teacher courses - in a real app, this would come from an API
-    const mockCourses = [
-      {
-        id: 1,
-        title: "Introduction to React",
-        students: 42,
-        level: "Beginner",
-        lastUpdated: "2023-05-15",
-        status: "Active",
-      },
-      {
-        id: 2,
-        title: "Advanced JavaScript",
-        students: 28,
-        level: "Advanced",
-        lastUpdated: "2023-04-20",
-        status: "Active",
-      },
-      {
-        id: 3,
-        title: "UX/UI Design Fundamentals",
-        students: 36,
-        level: "Intermediate",
-        lastUpdated: "2023-05-01",
-        status: "Active",
+    const fetchCourses = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+
+        const response = await axios.get(
+          "http://localhost:5000/api/courses/teacher/courses",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setCourses(response.data.courses);
+        console.log(response.data.courses);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-    ];
-    
-    setCourses(mockCourses);
-    setLoading(false);
+    };
+
+    fetchCourses();
   }, []);
+
+  const filteredCourses =
+    activeFilter === "all"
+      ? courses
+      : courses.filter(
+          (course) => course.status.toLowerCase() === activeFilter
+        );
 
   const handleAddCourse = (courseData) => {
     // Here you would typically send the data to your API
     console.log("Form submitted:", courseData);
-    
+
     // Close modal
     setIsModalOpen(false);
   };
 
   const navigate = useNavigate();
 
-  if (loading) {
-    return <p className="text-gray-600 text-center mt-10">Loading courses...</p>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="space-y-6">
@@ -93,7 +95,7 @@ const Courses = () => {
                 Completed
               </button>
             </div> */}
-            <button 
+            <button
               onClick={() => setIsModalOpen(true)}
               className="flex items-center px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm"
             >
@@ -102,89 +104,88 @@ const Courses = () => {
             </button>
           </div>
         </div>
-        
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Course
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Students
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Level
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Updated
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {courses && courses.length > 0 ? (
-                courses.map((course) => (
-                  <motion.tr 
-                    key={course.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{course.title}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{course.students}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{course.level}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {course.lastUpdated}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        {course.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
-                        <Link to={`/teacher-dashboard/courses/manage?id=${course.id}`} className="text-indigo-600 hover:text-indigo-900">
-                          Edit
-                        </Link>
-                        <a href="#" className="text-red-600 hover:text-red-900">
-                          Delete
-                        </a>
-                      </div>
-                    </td>
-                  </motion.tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                    No courses available.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCourses.map((course, index) => (
+            <div
+              key={index}
+              className="border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow"
+            >
+              <h3 className="font-bold text-lg">{course.courseName}</h3>
+              <p className="text-gray-600 mt-1">Code: {course.courseCode}</p>
+              <p className="text-gray-500 mt-1 text-sm">
+                duration : {course.duration} weeks{" "}
+              </p>
+
+              <div className="mt-4 flex justify-between items-center">
+                <div className="flex items-center">
+                  <FiUsers className="text-gray-400 mr-1" />
+                  <span className="text-sm text-gray-500">
+                    {course.maxStudents} students
+                  </span>
+                </div>
+                <span
+                  className={`text-xs font-medium px-2 py-1 rounded-full ${
+                    course.status === "Active"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-green-100 text-green-800"
+                  }`}
+                >
+                  {course.status}
+                </span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button
+                  onClick={() =>
+                    navigate(`/teacher-dashboard/courses/${course._id}/manage`)
+                  }
+                  className="flex justify-center items-center px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm font-medium"
+                >
+                  Manage Course
+                </button>
+                <button className="flex justify-center items-center px-4 py-2 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium">
+                  View Materials
+                </button>
+                <button className="flex justify-center items-center px-4 py-2 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium">
+                  Student Performance
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {filteredCourses.length === 0 && (
+            <div className="text-center py-12 bg-gray-50 rounded-xl">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FiBook className="text-gray-400 w-8 h-8" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-800 mb-1">
+                No Courses Found
+              </h3>
+              <p className="text-gray-500 mb-4">
+                {activeFilter === "all"
+                  ? "You haven't created any courses yet."
+                  : `You don't have any ${activeFilter} courses.`}
+              </p>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-4 py-2 bg-[#19a4db] text-white rounded-lg text-sm font-medium"
+              >
+                Create Your First Course
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Import the Course Modal Component */}
-      <AddCourseModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onSubmit={handleAddCourse} 
+      <AddCourseModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddCourse}
       />
     </div>
   );
 };
 
-export default Courses; 
+export default Courses;

@@ -73,7 +73,10 @@ function App() {
         >
           <Route index element={<Dashboard />} />
           <Route path="courses" element={<Courses />} />
-          <Route path="courses/manage" element={<CourseManagement />} />
+          <Route
+            path="courses/:courseId/manage"
+            element={<CourseManagement />}
+          />
           <Route path="students" element={<Students />} />
           <Route path="assignments" element={<Assignments />} />
           <Route path="attendance" element={<Attendance />} />

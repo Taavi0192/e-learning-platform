@@ -8,6 +8,9 @@ import passwordReset from "./routes/passwordReset.js";
 import googleAuthRoutes from "./routes/googleAuthRoutes.js";
 import passport from "passport";
 import session from "express-session";
+import courseRoutes from "./routes/courseRoutes.js";
+import path from "path";
+import assignmentRoutes from "./routes/assignmentRoutes.js";
 
 const app = express();
 
@@ -39,6 +42,10 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
+// Serve static files from the 'uploads' folder
+const __dirname = path.resolve();
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // Initialize Passport and restore authentication state from the session
 app.use(passport.initialize());
 app.use(passport.session());
@@ -49,5 +56,7 @@ app.use("/api/teacherRoutes", teacherRoutes);
 app.use("/api/adminRoutes", adminRoutes);
 app.use("/api/resetpassword", passwordReset);
 app.use("/api/googleAuth", googleAuthRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/assignments", assignmentRoutes);
 
 export default app;

@@ -4,7 +4,9 @@ export const verifyAccessToken = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1];
 
   if (!token) {
-    return res.status(401).json({ message: "Access denied, no token provided" });
+    return res
+      .status(401)
+      .json({ message: "Access denied, no token provided" });
   }
 
   try {
@@ -12,6 +14,7 @@ export const verifyAccessToken = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
+    console.log(error);
     return res.status(403).json({ message: "Invalid token" });
   }
 };
