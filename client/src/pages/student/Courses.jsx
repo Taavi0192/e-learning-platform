@@ -44,9 +44,9 @@ const Courses = () => {
   //   sessionStorage.setItem('selectedCourseId', courseId);
   //   navigate("/student-dashboard/courses/materials");
   // };
-  const handleViewMaterials = () => {
-    console.log("clicked view materials")
-    // sessionStorage.setItem("selectedCourse", JSON.stringify(course));
+  const handleViewMaterials = (course) => {
+    console.log("Selected course:", course);
+    sessionStorage.setItem("selectedCourse", JSON.stringify(course));
     navigate("/student-dashboard/courses/materials");
   };
   
@@ -108,7 +108,7 @@ const Courses = () => {
                   </button>
                   <button 
                     className="px-4 py-2 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium"
-                    onClick={() => handleViewMaterials()}
+                    onClick={() => handleViewMaterials(course)}
                   >
                     View Materials
                   </button>
