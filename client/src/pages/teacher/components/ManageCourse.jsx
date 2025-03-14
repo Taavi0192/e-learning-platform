@@ -75,42 +75,10 @@ const ManageCourse = () => {
   });
 
   // Add this to your state declarations
-  const [modules, setModules] = useState([
-    {
-      id: 1,
-      title: "Introduction to React Basics",
-      expanded: true,
-      lessons: [
-        { id: 1, title: "What is React?", duration: "10 min" },
-        {
-          id: 2,
-          title: "Setting up your development environment",
-          duration: "15 min",
-        },
-        { id: 3, title: "Your first React component", duration: "20 min" },
-      ],
-    },
-    {
-      id: 2,
-      title: "Working with Components",
-      expanded: false,
-      lessons: [
-        { id: 4, title: "Props and State", duration: "25 min" },
-        { id: 5, title: "Component lifecycle", duration: "15 min" },
-      ],
-    },
-  ]);
+  const [modules, setModules] = useState([]);
+  console.log("modules here", modules);
 
-  const [materials, setMaterials] = useState([
-    { id: 1, title: "React Fundamentals PDF", type: "pdf", size: "2.4 MB" },
-    {
-      id: 2,
-      title: "React Documentation",
-      type: "link",
-      url: "https://reactjs.org/docs",
-    },
-    { id: 3, title: "Introduction to JSX", type: "video", duration: "15:30" },
-  ]);
+  const [materials, setMaterials] = useState([]);
 
   // Load course data when component mounts
   useEffect(() => {
@@ -127,6 +95,7 @@ const ManageCourse = () => {
         );
         setCourse(response.data.course);
         setModules(response.data.course.modules || []);
+        console.log(response.data.course.modules);
         setMaterials(response.data.course.materials || []);
         console.log(response.data.course);
       } catch (error) {
@@ -192,15 +161,30 @@ const ManageCourse = () => {
   };
 
   // Add these functions to handle modules and lessons
+  // const toggleModule = (moduleId) => {
+  //   console.log(moduleId);
+  //   setModules(
+  //     modules.map((module) =>
+  //       module.id === moduleId
+  //         ? { ...module, expanded: !module.expanded }
+  //         : module
+  //     )
+  //   );
+  // };
+
   const toggleModule = (moduleId) => {
+    console.log(moduleId);
     setModules(
-      modules.map((module) =>
-        module.id === moduleId
-          ? { ...module, expanded: !module.expanded }
-          : module
-      )
+      modules.map((module) => {
+        if (module._id === moduleId) {
+          console.log(module.id); // Optional: Log the module ID if needed
+          return { ...module, expanded: !module.expanded };
+        } else {
+          return module;
+        }
+      })
     );
-  };
+};
 
   const addNewModule = () => {
     const newModule = {
@@ -232,6 +216,7 @@ const ManageCourse = () => {
   };
 
   const openLessonModal = (moduleId) => {
+    console.log(moduleId);
     setCurrentModuleId(moduleId);
     setCurrentLessonId(null);
     setIsEditingLesson(false);
@@ -771,7 +756,7 @@ const ManageCourse = () => {
                       >
                         <div
                           className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-100"
-                          onClick={() => toggleModule(module.id)}
+                          onClick={() => toggleModule(module._id)}
                         >
                           <div className="flex items-center">
                             {module.expanded ? (
@@ -810,7 +795,7 @@ const ManageCourse = () => {
                               <ul className="divide-y divide-gray-100">
                                 {module.lessons.map((lesson) => (
                                   <li
-                                    key={lesson.id}
+                                    key={lesson._id}
                                     className="py-3 flex justify-between items-center"
                                   >
                                     <div className="flex items-center">

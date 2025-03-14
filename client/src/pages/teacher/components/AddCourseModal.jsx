@@ -64,6 +64,7 @@ const AddCourseModal = ({ isOpen, onClose, onSubmit }) => {
 
       onSubmit(response.data.course);
       resetForm();
+      window.location.reload();
     } catch (error) {
       console.error("Error adding course:", error);
     }
