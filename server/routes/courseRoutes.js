@@ -8,6 +8,9 @@ import {
   getAllCourses,
   enrollInCourse,
   getEnrolledCourses,
+  getCourseModules,
+  deleteLesson,
+  getStudentsForCourse,
 } from "../controllers/courseController.js";
 import { verifyAccessToken } from "../middlewares/authMiddleware.js";
 import upload from "../config/multerConfig.js";
@@ -36,5 +39,13 @@ router
 router.get("/getallcourses", verifyAccessToken, getAllCourses);
 router.post("/enroll", verifyAccessToken, enrollInCourse);
 router.get("/enrolled", verifyAccessToken, getEnrolledCourses);
+router.get("/:courseId/modules", verifyAccessToken, getCourseModules);
+router.delete(
+  "/:courseId/modules/:moduleId/lessons/:lessonId",
+  verifyAccessToken,
+  deleteLesson
+);
+// Get students enrolled in a specific course
+router.get("/:courseId/students", verifyAccessToken, getStudentsForCourse);
 
 export default router;

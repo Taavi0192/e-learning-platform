@@ -33,7 +33,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-[#F8E8E8] flex flex-col">
       {/* Header Component */}
       <Header 
         toggleSidebar={toggleSidebar} 
@@ -47,8 +47,8 @@ const AdminDashboard = () => {
         <Sidebar isSidebarOpen={isSidebarOpen} navigate={navigate} />
         
         {/* Main content */}
-        <main className="flex-1 overflow-auto bg-gray-50 focus:outline-none">
-          <div className="py-6 px-4 sm:px-6 lg:px-8">
+        <main className="flex-1 overflow-auto bg-[#F8E8E8] focus:outline-none">
+          <div className="py-6 px-4 sm:px-6 lg:px-8 text-[#A01717]">
             <Routes>
               <Route path="/" element={<Overview />} />
               <Route path="/courses" element={<Courses />} />
@@ -67,4 +67,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard; 
+export default AdminDashboard;

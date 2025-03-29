@@ -27,6 +27,10 @@ const studentSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isRejected: {
+      type: Boolean,
+      default: false,
+    },
     password: {
       type: String,
       required: function () {

@@ -32,11 +32,13 @@ export const AuthProvider = ({ children }) => {
       const res = await api.post("/login", { email, password });
 
       const token = res.data.accessToken;
+      localStorage.setItem("accessToken", token);
       setAccessToken(token);
 
       const decodedUser = decodeToken(token);
       setUser(decodedUser);
       localStorage.setItem("user", JSON.stringify(decodedUser));
+      localStorage.setItem("adminToken", res.data.accessToken);
     } catch (error) {
       console.error(
         "Login error:",

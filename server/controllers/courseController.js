@@ -280,3 +280,88 @@ export const getEnrolledCourses = async (req, res) => {
       .json({ message: "Server error", error: error.message });
   }
 };
+
+export const getCourseModules = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const course = await Course.findById(courseId).select("modules");
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    return res.status(200).json({ modules: course.modules });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
+export const deleteLesson = async (req, res) => {
+  try {
+    const { courseId, moduleId, lessonId } = req.params;
+
+    // Find the course
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Find the module
+    const module = course.modules.id(moduleId);
+    if (!module) {
+      return res.status(404).json({ message: "Module not found" });
+    }
+
+    // Find the lesson index
+    const lessonIndex = module.lessons.findIndex(
+      (lesson) => lesson._id.toString() === lessonId
+    );
+    if (lessonIndex === -1) {
+      return res.status(404).json({ message: "Lesson not found" });
+    }
+
+    // Remove the lesson
+    module.lessons.splice(lessonIndex, 1);
+
+    // Save the course
+    await course.save();
+
+    return res.status(200).json({
+      message: "Lesson deleted successfully",
+      module: module,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
+// Get students enrolled in a specific course
+export const getStudentsForCourse = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+
+    // Find the course to verify it exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Find all students who have this course in their enrolledCourses array
+    const students = await Student.find({
+      enrolledCourses: { $in: [courseId] },
+    }).select("-password");
+
+    return res.status(200).json({
+      message: "Students fetched successfully",
+      students,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};

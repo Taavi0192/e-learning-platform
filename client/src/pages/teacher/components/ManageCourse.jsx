@@ -184,7 +184,7 @@ const ManageCourse = () => {
         }
       })
     );
-};
+  };
 
   const addNewModule = () => {
     const newModule = {
@@ -419,6 +419,44 @@ const ManageCourse = () => {
       size: "",
     });
     setIsMaterialModalOpen(false);
+  };
+
+  const handleDeleteLesson = async (moduleId, lessonId) => {
+    if (!window.confirm("Are you sure you want to delete this lesson?")) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await axios.delete(
+        `http://localhost:5000/api/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update the modules state to reflect the deletion
+      setModules((prevModules) =>
+        prevModules.map((module) => {
+          if (module._id === moduleId) {
+            return {
+              ...module,
+              lessons: module.lessons.filter(
+                (lesson) => lesson._id !== lessonId
+              ),
+            };
+          }
+          return module;
+        })
+      );
+
+      alert("Lesson deleted successfully");
+    } catch (error) {
+      console.error("Error deleting lesson:", error);
+      alert("Failed to delete lesson");
+    }
   };
 
   console.log(course);
@@ -820,7 +858,16 @@ const ManageCourse = () => {
                                       >
                                         <FiEdit size={15} />
                                       </button>
-                                      <button className="p-1 text-gray-400 hover:text-red-500">
+                                      <button
+                                        className="p-1 text-gray-400 hover:text-red-500"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeleteLesson(
+                                            module._id,
+                                            lesson._id
+                                          );
+                                        }}
+                                      >
                                         <FiTrash2 size={15} />
                                       </button>
                                     </div>
