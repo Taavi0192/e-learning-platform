@@ -13,14 +13,14 @@ const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
 // Generate Access Token (Short-Lived)
 const generateAccessToken = (admin) => {
-  return jwt.sign({ id: admin._id, email: admin.email }, ACCESS_TOKEN_SECRET, {
+  return jwt.sign({ id: admin._id, email: admin.email, role: "admin" }, ACCESS_TOKEN_SECRET, {
     expiresIn: "7d",
   });
 };
 
 // Generate Refresh Token (Long-Lived)
 const generateRefreshToken = (admin) => {
-  return jwt.sign({ id: admin._id, email: admin.email }, REFRESH_TOKEN_SECRET, {
+  return jwt.sign({ id: admin._id, email: admin.email, role: "admin" }, REFRESH_TOKEN_SECRET, {
     expiresIn: "7d",
   });
 };
@@ -42,6 +42,8 @@ export const loginAdmin = async (req, res) => {
     // Generate tokens
     const accessToken = generateAccessToken(admin);
     const refreshToken = generateRefreshToken(admin);
+
+    console.log("🔑 Generated Access Token:", accessToken);
 
     // Store refresh token in HTTP-Only Cookie
     res.cookie("refreshToken", refreshToken, {
