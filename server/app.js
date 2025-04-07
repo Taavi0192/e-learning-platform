@@ -3,6 +3,9 @@ import cors from "cors";
 import studentRoutes from "./routes/studentRoute.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import teacherRoutes from "./routes/teacherRoutes.js";
+import accountantRoutes from "./routes/accountantRoutes.js";
+import principalRoutes from "./routes/principalRoutes.js";
+import ownerRoutes from "./routes/ownerRoutes.js";
 import cookieParser from "cookie-parser";
 import passwordReset from "./routes/passwordReset.js";
 import googleAuthRoutes from "./routes/googleAuthRoutes.js";
@@ -51,12 +54,15 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
-app.use("/api/studentRoute", studentRoutes);
+app.use("/api/studentRoutes", studentRoutes);
 app.use("/api/teacherRoutes", teacherRoutes);
 app.use("/api/adminRoutes", adminRoutes);
 app.use("/api/resetpassword", passwordReset);
 app.use("/api/googleAuth", googleAuthRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/assignments", assignmentRoutes);
+app.use("/api/accountantRoutes", accountantRoutes);
+app.use("/api/principalRoutes", principalRoutes);
+app.use("/api/ownerRoutes", ownerRoutes);
 
 export default app;

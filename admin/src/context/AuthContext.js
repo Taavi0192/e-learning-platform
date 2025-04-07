@@ -2,11 +2,6 @@ import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-const api = axios.create({
-  baseURL: "http://localhost:5000/api/adminRoutes",
-  withCredentials: true,
-});
-
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -17,56 +12,70 @@ export const AuthProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(true);
 
+  // Decode token to get user info and role
   const decodeToken = (token) => {
     try {
       const decoded = jwtDecode(token);
-      return { id: decoded.id, email: decoded.email };
+      return { id: decoded.id, email: decoded.email, role: decoded.role };
     } catch (error) {
       console.error("Error decoding token:", error);
       return null;
     }
   };
 
-  const login = async (email, password) => {
+  // Role-based login: accepts "admin" or "accountant"
+  const login = async (email, password, role = "admin") => {
     try {
-      const res = await api.post("/login", { email, password });
+      const baseEndpoint =
+          role === "admin" ? "/api/adminRoutes/login" : "/api/accountantRoutes/login";
+
+      const res = await axios.post(
+          `http://localhost:5000${baseEndpoint}`,
+          { email, password },
+          { withCredentials: true }
+      );
 
       const token = res.data.accessToken;
       localStorage.setItem("accessToken", token);
+      localStorage.setItem("adminToken", token);
+
       setAccessToken(token);
 
       const decodedUser = decodeToken(token);
       setUser(decodedUser);
       localStorage.setItem("user", JSON.stringify(decodedUser));
-      localStorage.setItem("adminToken", res.data.accessToken);
     } catch (error) {
       console.error(
-        "Login error:",
-        error.response?.data?.message || error.message
+          "Login error:",
+          error.response?.data?.message || error.message
       );
       throw new Error(
-        error.response?.data?.message || "Invalid credentials or server error"
+          error.response?.data?.message || "Invalid credentials or server error"
       );
     }
   };
 
   const logout = async () => {
     try {
-      await api.post("/logout");
+      await axios.post("http://localhost:5000/api/adminRoutes/logout", null, {
+        withCredentials: true,
+      });
       setAccessToken(null);
       setUser(null);
       localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
     } catch (error) {
-      console.error(
-        "Logout error:",
-        error.response?.data?.message || error.message
-      );
+      console.error("Logout error:", error.response?.data?.message || error.message);
     }
   };
 
   const refreshAccessToken = async () => {
     try {
-      const res = await api.post("/refresh-token");
+      const res = await axios.post(
+          "http://localhost:5000/api/adminRoutes/refresh-token",
+          null,
+          { withCredentials: true }
+      );
 
       const token = res.data.accessToken;
       setAccessToken(token);
@@ -77,43 +86,38 @@ export const AuthProvider = ({ children }) => {
 
       return token;
     } catch (error) {
-      console.error(
-        "Refresh token error:",
-        error.response?.data?.message || error.message
-      );
+      console.error("Refresh token error:", error.response?.data?.message || error.message);
       setAccessToken(null);
       setUser(null);
       localStorage.removeItem("user");
     }
   };
 
-  // Axios interceptor to refresh token on 401 errors
+  // Axios interceptor to handle 401s
   useEffect(() => {
-    const interceptor = api.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        if (error.response?.status === 401) {
-          try {
-            const newAccessToken = await refreshAccessToken();
-            if (newAccessToken) {
-              error.config.headers[
-                "Authorization"
-              ] = `Bearer ${newAccessToken}`;
-              return api(error.config);
+    const interceptor = axios.interceptors.response.use(
+        (response) => response,
+        async (error) => {
+          if (error.response?.status === 401) {
+            try {
+              const newAccessToken = await refreshAccessToken();
+              if (newAccessToken) {
+                error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
+                return axios(error.config);
+              }
+            } catch (refreshError) {
+              console.error("Failed to refresh token:", refreshError);
+              logout();
             }
-          } catch (refreshError) {
-            console.error("Failed to refresh token:", refreshError);
-            logout();
           }
+          return Promise.reject(error);
         }
-        return Promise.reject(error);
-      }
     );
 
-    return () => api.interceptors.response.eject(interceptor);
+    return () => axios.interceptors.response.eject(interceptor);
   }, []);
 
-  // Auto-refresh token on app load (only if a user exists)
+  // Try refreshing token on initial load
   useEffect(() => {
     const fetchToken = async () => {
       if (localStorage.getItem("user")) {
@@ -125,19 +129,18 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider
-      value={{
-        accessToken,
-        user,
-        login,
-        logout,
-        refreshAccessToken,
-        loading,
-        api,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+      <AuthContext.Provider
+          value={{
+            accessToken,
+            user,
+            login,
+            logout,
+            refreshAccessToken,
+            loading,
+          }}
+      >
+        {children}
+      </AuthContext.Provider>
   );
 };
 

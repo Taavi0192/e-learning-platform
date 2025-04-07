@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import initializeAdmin from "../utils/initializeAdmin.js";
+import initializeAccountant from "../utils/initializeAccountant.js";
 
 const connectDB = async () => {
   try {
@@ -10,6 +11,7 @@ const connectDB = async () => {
       })
       .then(() => {
         initializeAdmin();
+        initializeAccountant();
       }); 
     console.log(" MongoDB connected successfully");
   } catch (error) {
