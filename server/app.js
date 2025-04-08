@@ -16,6 +16,7 @@ import path from "path";
 import assignmentRoutes from "./routes/assignmentRoutes.js";
 import staffSalaryRoutes from "./routes/staffSalaryRoutes.js";
 import fineRoutes from "./routes/fineRoutes.js";
+import expenseRoutes from "./routes/expenseRoutes.js";
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -68,5 +69,7 @@ app.use("/api/principalRoutes", principalRoutes);
 app.use("/api/ownerRoutes", ownerRoutes);
 app.use("/api/salary", staffSalaryRoutes);
 app.use("/api/fines", fineRoutes);
+app.use("/api/expenses", expenseRoutes);
+
 
 export default app;

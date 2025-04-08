@@ -10,7 +10,7 @@ import Sidebar from "../components/Sidebar";
 import FeeManagement from "./accountant/FeeManagement";
 import Payments from "./accountant/FineSecurity";
 import Salaries from "./accountant/StaffSalary";
-// import Expenses from "./accountant/Expenses";
+import Expenses from "./accountant/MiscellaneousExpenses";
 import AccountantOverview from "./accountant/Overview";
 
 const AccountantDashboard = () => {
@@ -50,7 +50,7 @@ const AccountantDashboard = () => {
                             <Route path="/fees" element={<FeeManagement />} />
                             <Route path="/payments" element={<Payments />} />
                             <Route path="/salaries" element={<Salaries />} />
-                        {/*    <Route path="/expenses" element={<Expenses />} />*/}
+                            <Route path="/expenses" element={<Expenses />} />
                         </Routes>
                     </div>
                 </main>

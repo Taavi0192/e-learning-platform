@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 
 const staffSalarySchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    role: { type: String, required: true },
+    teacherId: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
     month: { type: String, required: true },
     amount: { type: Number, required: true },
     status: { type: String, enum: ["paid", "unpaid"], default: "unpaid" },

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import Accountant from "../models/accountantModel.js";
 import Teacher from "../models/teacherModel.js";
 import Student from "../models/studentModel.js";
+import StaffSalary from "../models/staffSalaryModel.js";
 
 dotenv.config();
 
@@ -125,5 +126,31 @@ export const getAllStudents = async (req, res) => {
         res.status(200).json({ students });
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+export const getAllTeacherSalaries = async (req, res) => {
+    try {
+        const salaries = await StaffSalary.find().populate("teacherId", "username email");
+        res.status(200).json({ salaries });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch salaries", error: error.message });
+    }
+};
+
+export const markSalaryPaid = async (req, res) => {
+    const { salaryId } = req.params;
+
+    try {
+        const salary = await StaffSalary.findById(salaryId);
+        if (!salary) {
+            return res.status(404).json({ message: "Salary not found" });
+        }
+
+        salary.status = "paid";
+        await salary.save();
+        res.status(200).json({ message: "Salary updated", salary });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to update salary", error: error.message });
     }
 };
