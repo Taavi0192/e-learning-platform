@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import Accountant from "../models/accountantModel.js";
+import Teacher from "../models/teacherModel.js";
+import Student from "../models/studentModel.js";
 
 dotenv.config();
 
@@ -103,5 +105,25 @@ export const getAccountantDashboard = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: "Error loading dashboard" });
+    }
+};
+
+// Get all teachers
+export const getAllTeachers = async (req, res) => {
+    try {
+        const teachers = await Teacher.find().select("-password");
+        res.status(200).json({ teachers });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+// Get all students
+export const getAllStudents = async (req, res) => {
+    try {
+        const students = await Student.find().select("-password");
+        res.status(200).json({ students });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };

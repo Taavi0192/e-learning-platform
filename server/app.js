@@ -14,6 +14,8 @@ import session from "express-session";
 import courseRoutes from "./routes/courseRoutes.js";
 import path from "path";
 import assignmentRoutes from "./routes/assignmentRoutes.js";
+import staffSalaryRoutes from "./routes/staffSalaryRoutes.js";
+import fineRoutes from "./routes/fineRoutes.js";
 
 const app = express();
 
@@ -64,5 +66,7 @@ app.use("/api/assignments", assignmentRoutes);
 app.use("/api/accountantRoutes", accountantRoutes);
 app.use("/api/principalRoutes", principalRoutes);
 app.use("/api/ownerRoutes", ownerRoutes);
+app.use("/api/salary", staffSalaryRoutes);
+app.use("/api/fines", fineRoutes);
 
 export default app;

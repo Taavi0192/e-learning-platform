@@ -6,12 +6,12 @@ import { FiMenu, FiX } from "react-icons/fi";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 
-// // Import accountant subpages (to be created)
-// import FeeManagement from "./accountant/FeeManagement";
-// import Payments from "./accountant/Payments";
-// import Salaries from "./accountant/Salaries";
+// Import accountant subpages (to be created)
+import FeeManagement from "./accountant/FeeManagement";
+import Payments from "./accountant/FineSecurity";
+import Salaries from "./accountant/StaffSalary";
 // import Expenses from "./accountant/Expenses";
-// import AccountantOverview from "./accountant/Overview";
+import AccountantOverview from "./accountant/Overview";
 
 const AccountantDashboard = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -45,13 +45,13 @@ const AccountantDashboard = () => {
                 {/* Main Area */}
                 <main className="flex-1 overflow-auto bg-[#F8E8E8] focus:outline-none">
                     <div className="py-6 px-4 sm:px-6 lg:px-8 text-[#A01717]">
-                        {/*<Routes>*/}
-                        {/*    <Route path="/" element={<AccountantOverview />} />*/}
-                        {/*    <Route path="/fees" element={<FeeManagement />} />*/}
-                        {/*    <Route path="/payments" element={<Payments />} />*/}
-                        {/*    <Route path="/salaries" element={<Salaries />} />*/}
+                        <Routes>
+                            <Route path="/" element={<AccountantOverview />} />
+                            <Route path="/fees" element={<FeeManagement />} />
+                            <Route path="/payments" element={<Payments />} />
+                            <Route path="/salaries" element={<Salaries />} />
                         {/*    <Route path="/expenses" element={<Expenses />} />*/}
-                        {/*</Routes>*/}
+                        </Routes>
                     </div>
                 </main>
             </div>
