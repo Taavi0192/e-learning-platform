@@ -7,11 +7,11 @@ import logo from "../assets/logo.png";
 import AuthContext from "../context/AuthContext"; // Import AuthContext
 
 const Login = () => {
-  const { login } = useContext(AuthContext); // Get login function from AuthContext
+  const { login } = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("admin"); // New state for role selection
+  const [role, setRole] = useState("admin");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -25,11 +25,23 @@ const Login = () => {
     try {
       await login(email, password, role); // pass role
       toast.success("Login successful!");
+
       setTimeout(() => {
-        if (role === "admin") {
-          window.location.href = "/dashboard";
-        } else if (role === "accountant") {
-          window.location.href = "/accountant-dashboard";
+        switch (role) {
+          case "admin":
+            window.location.href = "/dashboard";
+            break;
+          case "accountant":
+            window.location.href = "/accountant-dashboard";
+            break;
+          case "owner":
+            window.location.href = "/owner-dashboard";
+            break;
+          case "principal":
+            window.location.href = "/principal-dashboard";
+            break;
+          default:
+            break;
         }
       }, 1000);
     } catch (error) {
@@ -66,7 +78,7 @@ const Login = () => {
               <div className="lg:hidden mb-8">
                 <img src={logo} alt="EduLearn" className="w-56 mx-auto" />
               </div>
-              <h3 className="text-3xl font-bold text-[#600000]">Admin Login</h3>
+              <h3 className="text-3xl font-bold text-[#600000]">Portal Login</h3>
               <p className="text-gray-500 mt-3 text-lg">
                 Access the e-learning platform controls
               </p>
@@ -78,7 +90,7 @@ const Login = () => {
                 <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl group-hover:text-[#D4AF37] transition-colors duration-200" />
                 <input
                     type="email"
-                    placeholder="Admin Email Address"
+                    placeholder="Email Address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -102,49 +114,26 @@ const Login = () => {
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                     onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? (
-                      <AiFillEyeInvisible className="text-2xl" />
-                  ) : (
-                      <AiFillEye className="text-2xl" />
-                  )}
+                  {showPassword ? <AiFillEyeInvisible className="text-2xl" /> : <AiFillEye className="text-2xl" />}
                 </button>
               </div>
 
               {/* Role Selection */}
               <div>
                 <p className="text-gray-700 mb-2">Login as</p>
-                <div className="flex space-x-6">
-                  <div className="flex items-center">
-                    <input
-                        id="role-admin"
-                        name="role"
-                        type="radio"
-                        value="admin"
-                        checked={role === "admin"}
-                        onChange={() => setRole("admin")}
-                        className="h-4 w-4 text-[#600000] focus:ring-[#D4AF37] border-gray-300"
-                    />
-                    <label htmlFor="role-admin" className="ml-2 text-gray-700">
-                      Admin
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                        id="role-accountant"
-                        name="role"
-                        type="radio"
-                        value="accountant"
-                        checked={role === "accountant"}
-                        onChange={() => setRole("accountant")}
-                        className="h-4 w-4 text-[#600000] focus:ring-[#D4AF37] border-gray-300"
-                    />
-                    <label
-                        htmlFor="role-accountant"
-                        className="ml-2 text-gray-700"
-                    >
-                      Accountant
-                    </label>
-                  </div>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                  {["admin", "accountant", "owner", "principal"].map((r) => (
+                      <label key={r} className="flex items-center space-x-2 text-sm text-gray-700">
+                        <input
+                            type="radio"
+                            value={r}
+                            checked={role === r}
+                            onChange={() => setRole(r)}
+                            className="h-4 w-4 text-[#600000] focus:ring-[#D4AF37] border-gray-300"
+                        />
+                        <span className="capitalize">{r}</span>
+                      </label>
+                  ))}
                 </div>
               </div>
 
@@ -154,9 +143,7 @@ const Login = () => {
                   onClick={handleLogin}
                   disabled={loading}
                   className={`w-full py-4 px-6 ${
-                      loading
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-[#600000] hover:opacity-90"
+                      loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#600000] hover:opacity-90"
                   } text-white rounded-xl text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:ring-offset-2 transition-all duration-200`}
               >
                 {loading ? "Signing In..." : "Sign In"}
@@ -165,20 +152,11 @@ const Login = () => {
 
             <p className="text-center text-gray-500 text-sm mt-8">
               Protected access to EduLearn administration portal. Subject to
-              <a
-                  href="#"
-                  className="text-[#600000] hover:text-[#D4AF37] transition-colors duration-200"
-              >
-                {" "}
-                Privacy Policy
-              </a>{" "}
-              and
-              <a
-                  href="#"
-                  className="text-[#600000] hover:text-[#D4AF37] transition-colors duration-200"
-              >
-                {" "}
-                Terms of Service
+              <a href="#" className="text-[#600000] hover:text-[#D4AF37] transition-colors duration-200">
+                {" "}Privacy Policy
+              </a>{" "}and
+              <a href="#" className="text-[#600000] hover:text-[#D4AF37] transition-colors duration-200">
+                {" "}Terms of Service
               </a>
             </p>
           </div>
