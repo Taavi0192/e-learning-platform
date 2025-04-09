@@ -14,7 +14,7 @@ const MiscellaneousExpenses = () => {
 
     const fetchExpenses = async () => {
         try {
-            const token = localStorage.getItem("accountantToken");
+            const token = localStorage.getItem("adminToken");
             const res = await axios.get("http://localhost:5000/api/expenses", {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -37,7 +37,7 @@ const MiscellaneousExpenses = () => {
 
     const handleAddExpense = async () => {
         try {
-            const token = localStorage.getItem("accountantToken");
+            const token = localStorage.getItem("adminToken");
             await axios.post("http://localhost:5000/api/expenses", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -53,7 +53,7 @@ const MiscellaneousExpenses = () => {
 
     const handleDelete = async (id) => {
         try {
-            const token = localStorage.getItem("accountantToken");
+            const token = localStorage.getItem("adminToken");
             await axios.delete(`http://localhost:5000/api/expenses/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,

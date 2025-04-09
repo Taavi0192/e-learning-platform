@@ -5,6 +5,7 @@ import Accountant from "../models/accountantModel.js";
 import Teacher from "../models/teacherModel.js";
 import Student from "../models/studentModel.js";
 import StaffSalary from "../models/staffSalaryModel.js";
+import Expense from "../models/expenseModel.js";
 
 dotenv.config();
 
@@ -152,5 +153,37 @@ export const markSalaryPaid = async (req, res) => {
         res.status(200).json({ message: "Salary updated", salary });
     } catch (error) {
         res.status(500).json({ message: "Failed to update salary", error: error.message });
+    }
+};
+
+export const createExpense = async (req, res) => {
+    try {
+        const expense = new Expense(req.body);
+        await expense.save();
+        res.status(201).json({ message: "Expense created", expense });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to create expense", error: error.message });
+    }
+};
+
+// Get all expenses
+export const getAllExpenses = async (req, res) => {
+    try {
+        const expenses = await Expense.find().sort({ date: -1 });
+        res.status(200).json({ expenses });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch expenses", error: error.message });
+    }
+};
+
+// Delete expense
+export const deleteExpense = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const expense = await Expense.findByIdAndDelete(id);
+        if (!expense) return res.status(404).json({ message: "Expense not found" });
+        res.status(200).json({ message: "Expense deleted", expense });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to delete expense", error: error.message });
     }
 };
