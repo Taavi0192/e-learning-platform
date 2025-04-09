@@ -64,7 +64,7 @@ import StudentSidebar from "../components/StudentSidebar";
 const StudentDashboard = () => {
   const userName = localStorage.getItem("userName");
 
-  // Mock notifications to avoid undefined issues
+  // Mock notifications
   const notifications = [
     {
       id: 1,
@@ -81,18 +81,23 @@ const StudentDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <StudentHeader studentName={userName} notifications={notifications} />
+      <div className="min-h-screen bg-[#F8E8E8] flex flex-col">
+        {/* Header */}
+        <StudentHeader studentName={userName} notifications={notifications} />
 
-      <div className="pt-16 flex">
-        <StudentSidebar />
+        {/* Sidebar + Main content wrapper */}
+        <div className="flex flex-1 pt-16">
+          {/* Sidebar */}
+          <StudentSidebar />
 
-        {/* Render nested routes dynamically */}
-        <main className="flex-1 p-6 overflow-x-hidden">
-          <Outlet /> {/* ✅ This dynamically renders the selected sub-route */}
-        </main>
+          {/* Main Content */}
+          <main className="flex-1 overflow-auto bg-[#F8E8E8] focus:outline-none">
+            <div className="py-6 px-4 sm:px-6 lg:px-8 text-[#A01717]">
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
   );
 };
 

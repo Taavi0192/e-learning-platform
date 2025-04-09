@@ -1,28 +1,23 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FiHome,
   FiBook,
   FiUsers,
   FiClipboard,
-  FiCalendar,
   FiCheckSquare,
-  FiFileText,
   FiSettings,
   FiLogOut,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { toast } from "react-toastify";
 
 const TeacherSidebar = () => {
-  const location = useLocation(); // Get current route
-
-  // Function to check if a tab is active
-  const isActive = (path) => location.pathname.startsWith(path);
-
+  const location = useLocation();
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  const isActive = (path) => location.pathname === path;
 
   const handleLogout = async () => {
     try {
@@ -35,118 +30,43 @@ const TeacherSidebar = () => {
   };
 
   return (
-    <aside className="bg-white shadow-lg h-[calc(100vh-4rem)] sticky top-16">
-      <div className="flex flex-col h-full py-6 px-4">
-        <nav className="flex-1 space-y-2">
-          <Link
-            to="/teacher-dashboard"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/teacher-dashboard") && !isActive("/teacher-dashboard/")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiHome className="mr-3 h-5 w-5" />
-            Dashboard
-          </Link>
+      <aside
+          className="bg-[#F8E8E8] shadow-lg z-20 fixed inset-y-0 left-0 w-64 pt-16 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)]"
+      >
+        <div className="flex flex-col h-full py-4 px-3">
+          <nav className="space-y-1 px-2">
+            <SidebarLink to="/teacher-dashboard" icon={<FiHome />} text="Dashboard" active={isActive("/teacher-dashboard")} />
+            <SidebarLink to="/teacher-dashboard/courses" icon={<FiBook />} text="My Courses" active={isActive("/teacher-dashboard/courses")} />
+            <SidebarLink to="/teacher-dashboard/students" icon={<FiUsers />} text="Students" active={isActive("/teacher-dashboard/students")} />
+            <SidebarLink to="/teacher-dashboard/assignments" icon={<FiClipboard />} text="Assignments" active={isActive("/teacher-dashboard/assignments")} />
+            <SidebarLink to="/teacher-dashboard/grades" icon={<FiCheckSquare />} text="Grades" active={isActive("/teacher-dashboard/grades")} />
+            <SidebarLink to="/teacher-dashboard/settings" icon={<FiSettings />} text="Settings" active={isActive("/teacher-dashboard/settings")} />
 
-          <Link
-            to="/teacher-dashboard/courses"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/teacher-dashboard/courses")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiBook className="mr-3 h-5 w-5" />
-            My Courses
-          </Link>
-
-          <Link
-            to="/teacher-dashboard/students"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/teacher-dashboard/students")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiUsers className="mr-3 h-5 w-5" />
-            Students
-          </Link>
-
-          <Link
-            to="/teacher-dashboard/assignments"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/teacher-dashboard/assignments")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiClipboard className="mr-3 h-5 w-5" />
-            Assignments
-          </Link>
-
-          {/* <Link
-            to="/teacher-dashboard/attendance"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/teacher-dashboard/attendance")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiCalendar className="mr-3 h-5 w-5" />
-            Attendance
-          </Link> */}
-
-          <Link
-            to="/teacher-dashboard/grades"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/teacher-dashboard/grades")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiCheckSquare className="mr-3 h-5 w-5" />
-            Grades
-          </Link>
-
-          {/* <Link
-            to="/teacher-dashboard/materials"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/teacher-dashboard/materials")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiFileText className="mr-3 h-5 w-5" />
-            Course Materials
-          </Link> */}
-
-          <Link
-            to="/teacher-dashboard/settings"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/teacher-dashboard/settings")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiSettings className="mr-3 h-5 w-5" />
-            Settings
-          </Link>
-        </nav>
-
-        <div className="pt-6 mt-6 border-t border-gray-200">
-          <button
-            onClick={() => handleLogout()}
-            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
-          >
-            <FiLogOut className="mr-3 h-5 w-5" />
-            Sign Out
-          </button>
+            <div className="pt-4 mt-4 border-t border-[#A01717]">
+              <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full px-4 py-3 text-sm text-[#A01717] hover:bg-[#F3D1D1] rounded-lg"
+              >
+                <FiLogOut className="mr-3 h-5 w-5" />
+                Sign Out
+              </button>
+            </div>
+          </nav>
         </div>
-      </div>
-    </aside>
+      </aside>
   );
 };
+
+const SidebarLink = ({ to, icon, text, active }) => (
+    <Link
+        to={to}
+        className={`flex items-center px-4 py-3 text-sm rounded-lg ${
+            active ? "bg-[#A01717] text-white" : "text-[#A01717] hover:bg-[#F3D1D1]"
+        }`}
+    >
+      <span className="mr-3 h-5 w-5">{icon}</span>
+      {text}
+    </Link>
+);
 
 export default TeacherSidebar;

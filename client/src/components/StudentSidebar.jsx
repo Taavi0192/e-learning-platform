@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FiBook,
   FiCalendar,
@@ -10,20 +10,17 @@ import {
   FiLogOut,
   FiPlusCircle,
 } from "react-icons/fi";
-import { useAuth } from "../context/AuthContext"; // Import useAuth for logout
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const StudentSidebar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation(); // Get the current route path
+  const location = useLocation();
 
-  // Function to check if a tab is active
   const isActive = (path) => location.pathname === path;
 
-  // Handle logout
   const handleLogout = async () => {
     try {
       await logout();
@@ -36,118 +33,47 @@ const StudentSidebar = () => {
   };
 
   return (
-    <aside className="w-64 bg-white shadow-lg sticky top-16 h-[calc(100vh-4rem)]">
-      <div className="flex flex-col h-full py-6 px-4">
-        <nav className="flex-1 space-y-2">
-          <Link
-            to="/student-dashboard"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/student-dashboard")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiCalendar className="mr-3 h-5 w-5" />
-            Dashboard
-          </Link>
+      <aside
+          className="bg-[#F8E8E8] shadow-lg z-20 fixed inset-y-0 left-0 transition-all duration-300 transform lg:sticky lg:top-16 lg:translate-x-0 lg:h-[calc(100vh-4rem)] pt-16 lg:pt-0"
+          style={{ width: "250px" }}
+      >
+        <div className="flex flex-col h-full py-4 px-3">
+          <nav className="space-y-1 px-2">
+            <SidebarLink to="/student-dashboard" icon={<FiCalendar />} text="Dashboard" active={isActive("/student-dashboard")} />
+            <SidebarLink to="/student-dashboard/courses" icon={<FiBook />} text="My Courses" active={isActive("/student-dashboard/courses")} />
+            <SidebarLink to="/student-dashboard/new-courses" icon={<FiPlusCircle />} text="New Courses" active={isActive("/student-dashboard/new-courses")} />
+            <SidebarLink to="/student-dashboard/progress" icon={<FiClock />} text="Learning Progress" active={isActive("/student-dashboard/progress")} />
+            <SidebarLink to="/student-dashboard/certificates" icon={<FiAward />} text="Certificates" active={isActive("/student-dashboard/certificates")} />
+            <SidebarLink to="/student-dashboard/attendance" icon={<FiCalendar />} text="Attendance" active={isActive("/student-dashboard/attendance")} />
+            <SidebarLink to="/student-dashboard/notifications" icon={<FiBell />} text="Notifications" active={isActive("/student-dashboard/notifications")} />
+            <SidebarLink to="/student-dashboard/support" icon={<FiMessageSquare />} text="Support & Help" active={isActive("/student-dashboard/support")} />
 
-          <Link
-            to="/student-dashboard/courses"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/student-dashboard/courses")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiBook className="mr-3 h-5 w-5" />
-            My Courses
-          </Link>
-
-          <Link
-            to="/student-dashboard/new-courses"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/student-dashboard/new-courses")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiPlusCircle className="mr-3 h-5 w-5" />
-            New Courses
-          </Link>
-
-          <Link
-            to="/student-dashboard/progress"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/student-dashboard/progress")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiClock className="mr-3 h-5 w-5" />
-            Learning Progress
-          </Link>
-
-          <Link
-            to="/student-dashboard/certificates"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/student-dashboard/certificates")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiAward className="mr-3 h-5 w-5" />
-            Certificates
-          </Link>
-
-          <Link
-            to="/student-dashboard/attendance"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/student-dashboard/attendance")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiCalendar className="mr-3 h-5 w-5" />
-            Attendance
-          </Link>
-
-          <Link
-            to="/student-dashboard/notifications"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/student-dashboard/notifications")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiBell className="mr-3 h-5 w-5" />
-            Notifications
-          </Link>
-
-          <Link
-            to="/student-dashboard/support"
-            className={`flex items-center w-full px-4 py-3 text-sm rounded-lg ${
-              isActive("/student-dashboard/support")
-                ? "bg-[#19a4db] text-white"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            <FiMessageSquare className="mr-3 h-5 w-5" />
-            Support & Help
-          </Link>
-        </nav>
-
-        {/* Logout Button */}
-        <div className="pt-6 mt-6 border-t border-gray-200">
-          <button
-            onClick={handleLogout}
-            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
-          >
-            <FiLogOut className="mr-3 h-5 w-5" />
-            Sign Out
-          </button>
+            <div className="pt-4 mt-4 border-t border-[#A01717]">
+              <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full px-4 py-3 text-sm text-[#A01717] hover:bg-[#F3D1D1] rounded-lg"
+              >
+                <FiLogOut className="mr-3 h-5 w-5" />
+                Sign Out
+              </button>
+            </div>
+          </nav>
         </div>
-      </div>
-    </aside>
+      </aside>
+  );
+};
+
+const SidebarLink = ({ to, icon, text, active }) => {
+  return (
+      <Link
+          to={to}
+          className={`flex items-center px-4 py-3 text-sm rounded-lg ${
+              active ? "bg-[#A01717] text-white" : "text-[#A01717] hover:bg-[#F3D1D1]"
+          }`}
+      >
+        <span className="mr-3 h-5 w-5">{icon}</span>
+        {text}
+      </Link>
   );
 };
 

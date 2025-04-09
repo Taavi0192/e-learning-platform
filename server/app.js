@@ -57,7 +57,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
-app.use("/api/studentRoutes", studentRoutes);
+app.use("/api/studentRoute", studentRoutes);
 app.use("/api/teacherRoutes", teacherRoutes);
 app.use("/api/adminRoutes", adminRoutes);
 app.use("/api/resetpassword", passwordReset);

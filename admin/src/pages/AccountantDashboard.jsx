@@ -3,8 +3,8 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 
 // Import shared components
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
+import Header from "../components/AccountantHeader";
+import Sidebar from "../components/AccountantSidebar";
 
 // Import accountant subpages (to be created)
 import FeeManagement from "./accountant/FeeManagement";
