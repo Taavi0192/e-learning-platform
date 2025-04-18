@@ -1,3 +1,4 @@
+// src/components/FineSecurity.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -9,7 +10,6 @@ const FineSecurity = () => {
     const [formData, setFormData] = useState({
         studentId: "",
         reason: "",
-        type: "fine",
         amount: "",
         issuedDate: "",
     });
@@ -24,13 +24,13 @@ const FineSecurity = () => {
             const res = await axios.get("http://localhost:5000/api/fines");
             setEntries(res.data.entries);
         } catch (err) {
-            toast.error("Failed to fetch fine/security data");
+            toast.error("Failed to fetch fine data");
         }
     };
 
     const fetchStudents = async () => {
         try {
-            const token = localStorage.getItem("adminToken"); // Or "adminToken" if you're still reusing it
+            const token = localStorage.getItem("adminToken");
             const response = await axios.get("http://localhost:5000/api/accountantRoutes/students", {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -50,34 +50,35 @@ const FineSecurity = () => {
 
     const handleAddEntry = async () => {
         try {
-            await axios.post("http://localhost:5000/api/fines", formData);
-            toast.success("Entry added");
+            // Force the type to "fine" in the payload
+            const payload = { ...formData, type: "fine" };
+            await axios.post("http://localhost:5000/api/fines", payload);
+            toast.success("Fine added");
             setFormData({
                 studentId: "",
                 reason: "",
-                type: "fine",
                 amount: "",
                 issuedDate: "",
             });
             fetchEntries();
         } catch (err) {
-            toast.error("Failed to add entry");
+            toast.error("Failed to add fine");
         }
     };
 
     const handleDelete = async (id) => {
         try {
             await axios.delete(`http://localhost:5000/api/fines/${id}`);
-            toast.success("Entry deleted");
+            toast.success("Fine deleted");
             fetchEntries();
         } catch (err) {
-            toast.error("Failed to delete entry");
+            toast.error("Failed to delete fine");
         }
     };
 
     return (
         <div className="bg-white shadow-lg rounded-xl p-6">
-            <h2 className="text-2xl font-bold mb-6 text-[#600000]">Fine & Security Collection</h2>
+            <h2 className="text-2xl font-bold mb-6 text-[#600000]">Fine Collection</h2>
 
             {/* Form */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -104,16 +105,6 @@ const FineSecurity = () => {
                     className="p-3 border rounded-lg"
                 />
 
-                <select
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    className="p-3 border rounded-lg"
-                >
-                    <option value="fine">Fine</option>
-                    <option value="security">Security</option>
-                </select>
-
                 <input
                     type="number"
                     name="amount"
@@ -135,7 +126,7 @@ const FineSecurity = () => {
                     onClick={handleAddEntry}
                     className="col-span-1 md:col-span-3 bg-[#600000] text-white py-3 rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition"
                 >
-                    <FiPlusCircle /> Add Entry
+                    <FiPlusCircle /> Add Fine
                 </button>
             </div>
 
@@ -145,11 +136,10 @@ const FineSecurity = () => {
                     <thead className="bg-[#F8E8E8] text-[#600000]">
                     <tr>
                         <th className="py-3 px-4">Student</th>
-                        <th className="py-3 px-4">Type</th>
                         <th className="py-3 px-4">Reason</th>
                         <th className="py-3 px-4">Amount</th>
                         <th className="py-3 px-4">Issued</th>
-                        <th className="py-3 px-4">Applies To</th>
+                        <th className="py-3 px-4">Status</th>
                         <th className="py-3 px-4">Actions</th>
                     </tr>
                     </thead>
@@ -159,13 +149,22 @@ const FineSecurity = () => {
                             <td className="py-2 px-4">
                                 {entry.studentId?.username || "N/A"}
                             </td>
-                            <td className="py-2 px-4 capitalize">{entry.type}</td>
                             <td className="py-2 px-4">{entry.reason}</td>
                             <td className="py-2 px-4">Rs. {entry.amount}</td>
                             <td className="py-2 px-4">
                                 {new Date(entry.issuedDate).toLocaleDateString()}
                             </td>
-                            <td className="py-2 px-4">{entry.appliedMonth}</td>
+                            <td className="py-2 px-4">
+            <span
+                className={`px-2 py-1 rounded-full text-sm font-medium ${
+                    entry.status === "paid"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-yellow-100 text-yellow-800"
+                }`}
+            >
+              {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+            </span>
+                            </td>
                             <td className="py-2 px-4">
                                 <button
                                     onClick={() => handleDelete(entry._id)}
@@ -182,6 +181,7 @@ const FineSecurity = () => {
                     <div className="text-center text-gray-500 py-4">No entries found.</div>
                 )}
             </div>
+
         </div>
     );
 };

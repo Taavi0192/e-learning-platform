@@ -3,7 +3,13 @@ import {
     loginAccountant,
     logoutAccountant,
     refreshAccessToken,
-    getAccountantDashboard, getAllTeacherSalaries, markSalaryPaid, createExpense, getAllExpenses, deleteExpense,
+    getAccountantDashboard,
+    getAllTeacherSalaries,
+    markSalaryPaid,
+    createExpense,
+    getAllExpenses,
+    deleteExpense,
+    getAccountantDashboardStats,
 } from "../controllers/accountantController.js";
 import { verifyAccessToken } from "../middlewares/verifyAccessToken.js";
 import {getAllStudents, getAllTeachers} from "../controllers/accountantController.js";
@@ -23,5 +29,7 @@ router.patch("/mark-paid/:salaryId", verifyAccessToken, markSalaryPaid);
 router.post("/", verifyAccessToken, createExpense);
 router.get("/", verifyAccessToken, getAllExpenses);
 router.delete("/:id", verifyAccessToken, deleteExpense);
+
+router.get("/dashboard", verifyAccessToken, getAccountantDashboardStats);
 
 export default router;

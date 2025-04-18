@@ -1,14 +1,29 @@
-import { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+
+// ——— GLOBAL AXIOS CONFIG ———
+axios.defaults.baseURL = "http://localhost:5000";
+axios.defaults.withCredentials = true;
+
+// Attach Authorization header on every request if we have a token
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [accessToken, setAccessToken] = useState(null);
+  const [accessToken, setAccessToken] = useState(
+      () => localStorage.getItem("accessToken")
+  );
   const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
+    const stored = localStorage.getItem("user");
+    return stored ? JSON.parse(stored) : null;
   });
   const [loading, setLoading] = useState(true);
 
@@ -17,66 +32,66 @@ export const AuthProvider = ({ children }) => {
     try {
       const decoded = jwtDecode(token);
       return { id: decoded.id, email: decoded.email, role: decoded.role };
-    } catch (error) {
-      console.error("Error decoding token:", error);
+    } catch (err) {
+      console.error("Error decoding token:", err);
       return null;
     }
   };
 
-  // Role-based login: accepts "admin" or "accountant"
   const login = async (email, password, role = "admin") => {
+    const routes = {
+      admin: "/api/adminRoutes/login",
+      accountant: "/api/accountantRoutes/login",
+      owner: "/api/ownerRoutes/login",
+      principal: "/api/principalRoutes/login",
+    };
     try {
-      const baseEndpoint =
-          role === "admin" ? "/api/adminRoutes/login" : "/api/accountantRoutes/login";
-
-      const res = await axios.post(
-          `http://localhost:5000${baseEndpoint}`,
-          { email, password },
-          { withCredentials: true }
-      );
-
+      const res = await axios.post(routes[role], { email, password });
       const token = res.data.accessToken;
       localStorage.setItem("accessToken", token);
-      localStorage.setItem("adminToken", token);
-
+      localStorage.setItem("userRole", role);
       setAccessToken(token);
 
       const decodedUser = decodeToken(token);
       setUser(decodedUser);
       localStorage.setItem("user", JSON.stringify(decodedUser));
-    } catch (error) {
-      console.error(
-          "Login error:",
-          error.response?.data?.message || error.message
-      );
-      throw new Error(
-          error.response?.data?.message || "Invalid credentials or server error"
-      );
+    } catch (err) {
+      console.error("Login error:", err.response?.data?.message || err.message);
+      throw new Error(err.response?.data?.message || "Invalid credentials");
     }
   };
 
   const logout = async () => {
+    const role = localStorage.getItem("userRole") || "admin";
+    const routes = {
+      admin: "/api/adminRoutes/logout",
+      accountant: "/api/accountantRoutes/logout",
+      owner: "/api/ownerRoutes/logout",
+      principal: "/api/principalRoutes/logout",
+    };
     try {
-      await axios.post("http://localhost:5000/api/adminRoutes/logout", null, {
-        withCredentials: true,
-      });
+      await axios.post(routes[role]);
+    } catch (err) {
+      console.error("Logout error:", err.response?.data?.message || err.message);
+    } finally {
       setAccessToken(null);
       setUser(null);
-      localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
-    } catch (error) {
-      console.error("Logout error:", error.response?.data?.message || error.message);
+      localStorage.removeItem("user");
+      localStorage.removeItem("userRole");
     }
   };
 
   const refreshAccessToken = async () => {
+    const role = localStorage.getItem("userRole") || "admin";
+    const routes = {
+      admin: "/api/adminRoutes/refresh-token",
+      accountant: "/api/accountantRoutes/refresh-token",
+      owner: "/api/ownerRoutes/refresh-token",
+      principal: "/api/principalRoutes/refresh-token",
+    };
     try {
-      const res = await axios.post(
-          "http://localhost:5000/api/adminRoutes/refresh-token",
-          null,
-          { withCredentials: true }
-      );
-
+      const res = await axios.post(routes[role]);
       const token = res.data.accessToken;
       setAccessToken(token);
 
@@ -85,47 +100,42 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(decodedUser));
 
       return token;
-    } catch (error) {
-      console.error("Refresh token error:", error.response?.data?.message || error.message);
-      setAccessToken(null);
-      setUser(null);
-      localStorage.removeItem("user");
+    } catch (err) {
+      console.error(
+          "Refresh token error:",
+          err.response?.data?.message || err.message
+      );
+      // if refresh fails, fully log out
+      await logout();
     }
   };
 
-  // Axios interceptor to handle 401s
+  // Handle 401 → try refresh → retry original request
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
-        (response) => response,
+        (res) => res,
         async (error) => {
           if (error.response?.status === 401) {
-            try {
-              const newAccessToken = await refreshAccessToken();
-              if (newAccessToken) {
-                error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
-                return axios(error.config);
-              }
-            } catch (refreshError) {
-              console.error("Failed to refresh token:", refreshError);
-              logout();
+            const newToken = await refreshAccessToken();
+            if (newToken) {
+              error.config.headers.Authorization = `Bearer ${newToken}`;
+              return axios(error.config);
             }
           }
           return Promise.reject(error);
         }
     );
-
     return () => axios.interceptors.response.eject(interceptor);
   }, []);
 
-  // Try refreshing token on initial load
+  // On mount: if we already have a user, try to refresh immediately
   useEffect(() => {
-    const fetchToken = async () => {
+    (async () => {
       if (localStorage.getItem("user")) {
         await refreshAccessToken();
       }
       setLoading(false);
-    };
-    fetchToken();
+    })();
   }, []);
 
   return (

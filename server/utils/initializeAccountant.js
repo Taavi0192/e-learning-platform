@@ -17,12 +17,12 @@ const initializeAccountant = async () => {
             });
 
             await newAccountant.save();
-            console.log("✅ Accountant created successfully");
+            console.log("Accountant created successfully");
         } else {
-            console.log("ℹ️ Accountant already exists, skipping creation.");
+            console.log("ℹAccountant already exists, skipping creation.");
         }
     } catch (error) {
-        console.error("❌ Error initializing accountant:", error);
+        console.error("Error initializing accountant:", error);
     }
 };
 

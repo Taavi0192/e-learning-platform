@@ -9,8 +9,12 @@ const MiscellaneousExpenses = () => {
         title: "",
         amount: "",
         date: "",
+        category: "General",
         description: "",
     });
+    const [monthlyTotal, setMonthlyTotal] = useState(0);
+
+    const categories = ["General", "Maintenance", "Supplies", "Utilities"];
 
     const fetchExpenses = async () => {
         try {
@@ -20,7 +24,25 @@ const MiscellaneousExpenses = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setExpenses(res.data.expenses);
+
+            const allExpenses = res.data.expenses;
+            setExpenses(allExpenses);
+
+            // Filter for current month
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            const total = allExpenses
+                .filter((e) => {
+                    const date = new Date(e.date);
+                    return (
+                        date.getMonth() === currentMonth &&
+                        date.getFullYear() === currentYear
+                    );
+                })
+                .reduce((sum, e) => sum + e.amount, 0);
+
+            setMonthlyTotal(total);
         } catch (error) {
             toast.error("Failed to load expenses");
         }
@@ -44,7 +66,7 @@ const MiscellaneousExpenses = () => {
                 },
             });
             toast.success("Expense added");
-            setFormData({ title: "", amount: "", date: "", description: "" });
+            setFormData({ title: "", amount: "", date: "", category: "General", description: "" });
             fetchExpenses();
         } catch (error) {
             toast.error("Failed to add expense");
@@ -68,7 +90,10 @@ const MiscellaneousExpenses = () => {
 
     return (
         <div className="bg-white shadow-lg rounded-xl p-6">
-            <h2 className="text-2xl font-bold mb-6 text-[#600000]">Miscellaneous Expenses</h2>
+            <h2 className="text-2xl font-bold mb-2 text-[#600000]">Miscellaneous Expenses</h2>
+            <p className="mb-6 text-lg font-semibold text-gray-700">
+                Total for this month: <span className="text-[#600000]">Rs. {monthlyTotal}</span>
+            </p>
 
             {/* Form */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -95,6 +120,18 @@ const MiscellaneousExpenses = () => {
                     onChange={handleChange}
                     className="p-3 border rounded-lg"
                 />
+                <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="p-3 border rounded-lg"
+                >
+                    {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                            {cat}
+                        </option>
+                    ))}
+                </select>
                 <input
                     type="text"
                     name="description"
@@ -120,6 +157,7 @@ const MiscellaneousExpenses = () => {
                         <th className="py-3 px-4">Title</th>
                         <th className="py-3 px-4">Amount</th>
                         <th className="py-3 px-4">Date</th>
+                        <th className="py-3 px-4">Category</th>
                         <th className="py-3 px-4">Description</th>
                         <th className="py-3 px-4">Actions</th>
                     </tr>
@@ -130,6 +168,7 @@ const MiscellaneousExpenses = () => {
                             <td className="py-2 px-4">{expense.title}</td>
                             <td className="py-2 px-4">Rs. {expense.amount}</td>
                             <td className="py-2 px-4">{new Date(expense.date).toLocaleDateString()}</td>
+                            <td className="py-2 px-4">{expense.category}</td>
                             <td className="py-2 px-4">{expense.description}</td>
                             <td className="py-2 px-4">
                                 <button

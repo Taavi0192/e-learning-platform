@@ -1,12 +1,17 @@
 import express from "express";
+import {
+    loginOwner,
+    logoutOwner,
+    refreshAccessToken,
+    getOwnerDashboard,
+} from "../controllers/ownerController.js";
 import { verifyAccessToken } from "../middlewares/verifyAccessToken.js";
 
 const router = express.Router();
 
-router.get("/dashboard", verifyAccessToken, (req, res) => {
-    res.status(200).json({
-        message: `Welcome Owner ${req.user.email}`,
-    });
-});
+router.post("/login", loginOwner);
+router.post("/logout", logoutOwner);
+router.post("/refresh-token", refreshAccessToken);
+router.get("/owner-dashboard", verifyAccessToken, getOwnerDashboard);
 
 export default router;

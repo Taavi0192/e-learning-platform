@@ -17,6 +17,7 @@ import assignmentRoutes from "./routes/assignmentRoutes.js";
 import staffSalaryRoutes from "./routes/staffSalaryRoutes.js";
 import fineRoutes from "./routes/fineRoutes.js";
 import expenseRoutes from "./routes/AccountantRoutes.js";
+import feeRoutes from "./routes/feeRoutes.js";
 
 const app = express();
 
@@ -70,6 +71,7 @@ app.use("/api/ownerRoutes", ownerRoutes);
 app.use("/api/salary", staffSalaryRoutes);
 app.use("/api/fines", fineRoutes);
 app.use("/api/expenses", expenseRoutes);
+app.use("/api/fees", feeRoutes);
 
 
 

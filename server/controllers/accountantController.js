@@ -6,6 +6,7 @@ import Teacher from "../models/teacherModel.js";
 import Student from "../models/studentModel.js";
 import StaffSalary from "../models/staffSalaryModel.js";
 import Expense from "../models/expenseModel.js";
+import Fee from "../models/Fee.js";
 
 dotenv.config();
 
@@ -185,5 +186,41 @@ export const deleteExpense = async (req, res) => {
         res.status(200).json({ message: "Expense deleted", expense });
     } catch (error) {
         res.status(500).json({ message: "Failed to delete expense", error: error.message });
+    }
+};
+
+export const getAccountantDashboardStats = async (req, res) => {
+    try {
+        const thisMonth = new Date();
+        const currentMonthStr = `${thisMonth.getFullYear()}-${String(thisMonth.getMonth() + 1).padStart(2, "0")}`;
+
+        const [students, fees, salaries, expenses] = await Promise.all([
+            Student.find(),
+            Fee.find({ month: currentMonthStr }),
+            StaffSalary.find({ month: currentMonthStr }),
+            Expense.find({
+                date: {
+                    $gte: new Date(thisMonth.getFullYear(), thisMonth.getMonth(), 1),
+                    $lte: new Date(thisMonth.getFullYear(), thisMonth.getMonth() + 1, 0),
+                },
+            }),
+        ]);
+
+        const studentsPaid = fees.filter(fee => fee.status === "paid").length;
+        const pendingFeeSlips = students.length - fees.length;
+
+        const salaryDisbursed = salaries.filter(s => s.status === "paid").length;
+        const salaryPending = salaries.filter(s => s.status !== "paid").length;
+        const monthlyExpenses = expenses.length;
+
+        res.json({
+            pendingFeeSlips,
+            studentsPaid,
+            salaryDisbursed,
+            salaryPending,
+            monthlyExpenses,
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch accountant dashboard data", error: error.message });
     }
 };

@@ -10,11 +10,6 @@ const fineSecuritySchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    type: {
-        type: String,
-        enum: ["fine", "security"],
-        required: true,
-    },
     amount: {
         type: Number,
         required: true,
@@ -23,9 +18,10 @@ const fineSecuritySchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    appliedMonth: {
-        type: String, // e.g. "April 2025"
-        required: true,
+    status: {
+        type: String,
+        enum: ["pending", "paid"],
+        default: "pending",
     },
 });
 
