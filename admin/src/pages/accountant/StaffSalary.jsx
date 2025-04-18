@@ -56,6 +56,10 @@ const TeacherPayments = () => {
 
     const getSalaryInfo = (teacherId) => salaries.find(s => s.teacherId._id === teacherId);
 
+    const currentMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
+    const [infoMessage, setInfoMessage] = useState("");
+
+
     return (
         <div className="bg-white shadow-lg rounded-xl p-6">
             <h2 className="text-2xl font-bold mb-6 text-[#600000]">Teacher Salary Management</h2>
@@ -64,6 +68,36 @@ const TeacherPayments = () => {
                 <div className="text-center text-gray-500 py-10">Loading...</div>
             ) : (
                 <div className="overflow-x-auto">
+                    <div className="flex justify-end mb-4">
+                        <button
+                            onClick={async () => {
+                                setLoading(true);
+                                setInfoMessage("");
+                                try {
+                                    const { data } = await axios.post(
+                                        "http://localhost:5000/api/accountantRoutes/generate-teacher-salaries",
+                                        { month: currentMonth },
+                                        {
+                                            headers: {
+                                                Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+                                            },
+                                        }
+                                    );
+                                    setInfoMessage(data.message);
+                                    fetchSalaries();
+                                } catch (err) {
+                                    setInfoMessage("Error generating salary slips.");
+                                } finally {
+                                    setLoading(false);
+                                }
+                            }}
+                            className="bg-[#600000] hover:bg-[#4a0000] text-white px-4 py-2 rounded disabled:opacity-50"
+                            disabled={loading}
+                        >
+                            {loading ? "Generating…" : "Generate All Teacher Salary Slips"}
+                        </button>
+                    </div>
+
                     <table className="min-w-full bg-white text-left border">
                         <thead className="bg-[#F8E8E8] text-[#600000]">
                         <tr>
@@ -92,7 +126,9 @@ const TeacherPayments = () => {
                                             </span>
                                     </td>
                                     <td className="py-3 px-4">
-                                        {salary?.status !== "paid" ? (
+                                        {!salary ? (
+                                            <span className="text-gray-400 text-sm">No Slip</span>
+                                        ) : salary.status !== "paid" ? (
                                             <button
                                                 onClick={() => handlePay(salary._id)}
                                                 className="flex items-center gap-2 text-sm bg-[#600000] hover:opacity-90 text-white py-2 px-4 rounded-lg transition"
@@ -104,6 +140,7 @@ const TeacherPayments = () => {
                                             <span className="text-green-600 font-medium text-sm">Paid</span>
                                         )}
                                     </td>
+
                                 </tr>
                             );
                         })}

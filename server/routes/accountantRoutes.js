@@ -13,6 +13,7 @@ import {
 } from "../controllers/accountantController.js";
 import { verifyAccessToken } from "../middlewares/verifyAccessToken.js";
 import {getAllStudents, getAllTeachers} from "../controllers/accountantController.js";
+import {generateAllTeacherSalaries} from "../controllers/staffSalaryController.js";
 
 const router = express.Router();
 
@@ -32,5 +33,8 @@ router.delete("/:id", verifyAccessToken, deleteExpense);
 
 router.get("/dashboard", verifyAccessToken, getAccountantDashboardStats);
 router.post("/seed-dashboard", seedDashboardTestData);
+
+router.post("/generate-teacher-salaries", verifyAccessToken, generateAllTeacherSalaries);
+
 
 export default router;
