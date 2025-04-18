@@ -207,7 +207,7 @@ export const getAccountantDashboardStats = async (req, res) => {
         ]);
 
         const studentsPaid = fees.filter(fee => fee.status === "paid").length;
-        const pendingFeeSlips = students.length - fees.length;
+        const pendingFeeSlips = fees.filter(fee => fee.status === "pending").length;
 
         const salaryDisbursed = salaries.filter(s => s.status === "paid").length;
         const salaryPending = salaries.filter(s => s.status !== "paid").length;
@@ -222,5 +222,92 @@ export const getAccountantDashboardStats = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: "Failed to fetch accountant dashboard data", error: error.message });
+    }
+};
+
+export const seedDashboardTestData = async (req, res) => {
+    try {
+        const thisMonth = new Date();
+        const month = `${thisMonth.getFullYear()}-${String(thisMonth.getMonth() + 1).padStart(2, "0")}`;
+        const hashedPassword = await bcrypt.hash("123456", 10);
+
+        // ✅ 1. Add Students
+        const students = await Student.insertMany([
+            {
+                username: "Ali",
+                email: "ali@email.com",
+                password: hashedPassword,
+                isApproved: true,
+            },
+            {
+                username: "Sara",
+                email: "sara@email.com",
+                password: hashedPassword,
+                isApproved: true,
+            },
+            {
+                username: "Ahmed",
+                email: "ahmed@email.com",
+                password: hashedPassword,
+                isApproved: true,
+            },
+            {
+                username: "Zainab",
+                email: "zainab@email.com",
+                password: hashedPassword,
+                isApproved: true,
+            },
+            {
+                username: "Usman",
+                email: "usman@email.com",
+                password: hashedPassword,
+                isApproved: true,
+            },
+        ]);
+
+        // ✅ 2. Create Fee Records
+        await Fee.insertMany([
+            { student: students[0]._id, amount: 10000, status: "paid", month },
+            { student: students[1]._id, amount: 10000, status: "paid", month },
+            { student: students[2]._id, amount: 10000, status: "paid", month },
+            { student: students[3]._id, amount: 10000, status: "pending", month },
+            { student: students[4]._id, amount: 10000, status: "pending", month },
+        ]);
+
+        // ✅ 3. Add Teachers
+        const teachers = await Teacher.insertMany([
+            {
+                username: "Miss Fatima",
+                email: "fatima@school.com",
+                password: hashedPassword,
+                isApproved: true,
+            },
+            {
+                username: "Sir Bilal",
+                email: "bilal@school.com",
+                password: hashedPassword,
+                isApproved: true,
+            },
+        ]);
+
+        // ✅ 4. Create Salaries
+        await StaffSalary.insertMany([
+            { teacherId: teachers[0]._id, amount: 50000, status: "paid", month },
+            { teacherId: teachers[1]._id, amount: 50000, status: "paid", month },
+            { teacherId: teachers[0]._id, amount: 50000, status: "unpaid", month },
+            { teacherId: teachers[1]._id, amount: 50000, status: "unpaid", month },
+        ]);
+
+        // ✅ 5. Add Expenses
+        await Expense.insertMany([
+            { title: "Generator Repair", amount: 7000, category: "Maintenance", date: new Date(), remarks: "Monthly repair" },
+            { title: "Water Bottles", amount: 1500, category: "Supplies", date: new Date(), remarks: "Admin block" },
+            { title: "WiFi", amount: 3000, category: "Utilities", date: new Date(), remarks: "PTCL Bill" },
+        ]);
+
+        res.status(201).json({ message: "Test data seeded!" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Failed to seed data", error: error.message });
     }
 };
