@@ -2,6 +2,10 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import Owner from "../models/ownerModel.js";
+import Fee from "../models/Fee.js";
+import FineSecurity from "../models/FineSecurity.js";
+import staffSalaryModel from "../models/staffSalaryModel.js";
+import Expense from "../models/expenseModel.js";
 
 dotenv.config();
 
@@ -91,5 +95,121 @@ export const getOwnerDashboard = async (req, res) => {
         res.json({ message: `Welcome Owner ${req.user.email}` });
     } catch (error) {
         res.status(500).json({ message: "Error loading dashboard" });
+    }
+};
+
+export const getOwnerStats = async (req, res) => {
+    try {
+        const currentMonth = new Date().toISOString().slice(0, 7); // "2025-04"
+        const lastMonthDate = new Date();
+        lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
+        const lastMonth = lastMonthDate.toISOString().slice(0, 7);
+
+        const months = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
+
+        const chartData = [];
+        for (let i = 0; i < 12; i++) {
+            const yearMonth = `${new Date().getFullYear()}-${String(i + 1).padStart(2, "0")}`;
+
+            const feeRevenue = await Fee.aggregate([
+                { $match: { status: "paid", month: yearMonth } },
+                { $group: { _id: null, total: { $sum: "$amount" } } },
+            ]);
+            const fineRevenue = await FineSecurity.aggregate([
+                { $match: { status: "paid", issuedDate: { $gte: new Date(`${yearMonth}-01`), $lt: new Date(`${yearMonth}-31`) } } },
+                { $group: { _id: null, total: { $sum: "$amount" } } },
+            ]);
+            const salaryExpense = await staffSalaryModel.aggregate([
+                { $match: { status: "paid", month: yearMonth } },
+                { $group: { _id: null, total: { $sum: "$amount" } } },
+            ]);
+            const miscExpense = await Expense.aggregate([
+                {
+                    $match: {
+                        date: {
+                            $gte: new Date(`${yearMonth}-01`),
+                            $lt: new Date(`${yearMonth}-31`)
+                        }
+                    }
+                },
+                { $group: { _id: null, total: { $sum: "$amount" } } },
+            ]);
+
+            const revenue = (feeRevenue[0]?.total || 0) + (fineRevenue[0]?.total || 0);
+            const expense = (salaryExpense[0]?.total || 0) + (miscExpense[0]?.total || 0);
+            const profit = revenue - expense;
+
+            chartData.push({
+                label: months[i],
+                revenue,
+                expense,
+                profit
+            });
+        }
+
+        const currentSummary = chartData[new Date().getMonth()];
+        const lastSummary = chartData[new Date().getMonth() - 1] || { revenue: 0, expense: 0, profit: 0 };
+
+        res.json({
+            summary: {
+                thisMonth: currentSummary,
+                lastMonth: lastSummary,
+            },
+            chart: {
+                labels: months,
+                datasets: {
+                    revenue: chartData.map((d) => d.revenue),
+                    expense: chartData.map((d) => d.expense),
+                    profit: chartData.map((d) => d.profit),
+                }
+            }
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Error fetching owner stats", error: err.message });
+    }
+};
+
+export const getExpenseBreakdown = async (req, res) => {
+    try {
+        const currentMonth = new Date().toISOString().slice(0, 7); // "2025-04"
+
+        // Get paid salaries for current month
+        const salarySum = await staffSalaryModel.aggregate([
+            { $match: { status: "paid", month: currentMonth } },
+            { $group: { _id: "Teacher Salaries", total: { $sum: "$amount" } } },
+        ]);
+
+        // Get expense categories for current month
+        const expenseSums = await Expense.aggregate([
+            {
+                $match: {
+                    date: {
+                        $gte: new Date(`${currentMonth}-01`),
+                        $lt: new Date(`${currentMonth}-31`),
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: "$category",
+                    total: { $sum: "$amount" },
+                },
+            },
+        ]);
+
+        const breakdown = [
+            ...salarySum,
+            ...expenseSums,
+        ];
+
+        res.json(breakdown);
+    } catch (error) {
+        console.error("Error getting expense breakdown:", error);
+        res.status(500).json({ message: "Failed to fetch expense breakdown" });
     }
 };
