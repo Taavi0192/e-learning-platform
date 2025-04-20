@@ -3,8 +3,8 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 
 // Components
-import Header from "../components/Header";
-import OwnerSidebar from "../components/Sidebar";
+import Header from "../components/OwnerHeader";
+import OwnerSidebar from "../components/OwnerSidebar";
 
 // Pages (create these or reuse similar ones)
 import Dashboard from "./owner/Dashboard";
