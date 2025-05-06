@@ -213,3 +213,132 @@ export const getExpenseBreakdown = async (req, res) => {
         res.status(500).json({ message: "Failed to fetch expense breakdown" });
     }
 };
+
+// ✅ 1️⃣ Revenue Details (combining Fee + FineSecurity)
+export const getRevenueDetails = async (req, res) => {
+    try {
+        const feePayments = await Fee.find({ status: "paid" }).select("student amount month paymentDate");
+        const fines = await FineSecurity.find({ status: "paid" }).select("student amount issuedDate");
+
+        const formattedFees = feePayments.map((item) => ({
+            type: "Fee",
+            student: item.student,
+            amount: item.amount,
+            month: item.month,
+            date: item.paymentDate,
+        }));
+
+        const formattedFines = fines.map((item) => ({
+            type: "Fine",
+            student: item.student,
+            amount: item.amount,
+            month: item.issuedDate?.toISOString().slice(0, 7),
+            date: item.issuedDate,
+        }));
+
+        const combined = [...formattedFees, ...formattedFines].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        res.status(200).json(combined);
+    } catch (error) {
+        console.error("Failed to fetch revenue details:", error);
+        res.status(500).json({ message: "Error fetching revenue details" });
+    }
+};
+
+// ✅ 2️⃣ Expense Details (combining Salaries + Misc Expenses)
+export const getExpenseDetails = async (req, res) => {
+    try {
+        const salaries = await staffSalaryModel.find({ status: "paid" }).select("teacher amount month payDate");
+        const expenses = await Expense.find().select("category amount date notes");
+
+        const formattedSalaries = salaries.map((item) => ({
+            type: "Salary",
+            recipient: item.teacher,
+            amount: item.amount,
+            category: "Teacher Salaries",
+            month: item.month,
+            date: item.payDate,
+            notes: "",
+        }));
+
+        const formattedExpenses = expenses.map((item) => ({
+            type: "Misc Expense",
+            recipient: "",
+            amount: item.amount,
+            category: item.category,
+            date: item.date,
+            notes: item.notes || "",
+        }));
+
+        const combined = [...formattedSalaries, ...formattedExpenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        res.status(200).json(combined);
+    } catch (error) {
+        console.error("Failed to fetch expense details:", error);
+        res.status(500).json({ message: "Error fetching expense details" });
+    }
+};
+
+// ✅ 3️⃣ Profit Report (month-by-month)
+export const getProfitReport = async (req, res) => {
+    try {
+        const currentYear = new Date().getFullYear();
+        const monthlyReport = [];
+
+        for (let i = 0; i < 12; i++) {
+            const monthStr = String(i + 1).padStart(2, "0");
+            const yearMonth = `${currentYear}-${monthStr}`;
+
+            const feeRevenue = await Fee.aggregate([
+                { $match: { status: "paid", month: yearMonth } },
+                { $group: { _id: null, total: { $sum: "$amount" } } },
+            ]);
+
+            const fineRevenue = await FineSecurity.aggregate([
+                {
+                    $match: {
+                        status: "paid",
+                        issuedDate: {
+                            $gte: new Date(`${yearMonth}-01`),
+                            $lt: new Date(`${yearMonth}-31`),
+                        },
+                    },
+                },
+                { $group: { _id: null, total: { $sum: "$amount" } } },
+            ]);
+
+            const salaryExpense = await staffSalaryModel.aggregate([
+                { $match: { status: "paid", month: yearMonth } },
+                { $group: { _id: null, total: { $sum: "$amount" } } },
+            ]);
+
+            const miscExpense = await Expense.aggregate([
+                {
+                    $match: {
+                        date: {
+                            $gte: new Date(`${yearMonth}-01`),
+                            $lt: new Date(`${yearMonth}-31`),
+                        },
+                    },
+                },
+                { $group: { _id: null, total: { $sum: "$amount" } } },
+            ]);
+
+            const revenue = (feeRevenue[0]?.total || 0) + (fineRevenue[0]?.total || 0);
+            const expense = (salaryExpense[0]?.total || 0) + (miscExpense[0]?.total || 0);
+            const profit = revenue - expense;
+
+            monthlyReport.push({
+                month: new Date(currentYear, i).toLocaleString("default", { month: "long", year: "numeric" }),
+                revenue,
+                expense,
+                profit,
+            });
+        }
+
+        res.status(200).json(monthlyReport);
+    } catch (error) {
+        console.error("Failed to fetch profit report:", error);
+        res.status(500).json({ message: "Error fetching profit report" });
+    }
+};

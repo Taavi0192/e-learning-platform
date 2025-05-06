@@ -22,7 +22,7 @@ import Materials from "./pages/teacher/Materials";
 import Settings from "./pages/teacher/Settings";
 
 // Student Components
-// import StudentDashboard from "./pages/student/Dashboard";
+import StudentHome from "./pages/student/Dashboard";
 import StudentCourses from "./pages/student/Courses";
 import NewCourses from "./pages/student/NewCourses";
 import Progress from "./pages/student/Progress";
@@ -31,6 +31,9 @@ import StudentAttendance from "./pages/student/Attendance";
 import Notifications from "./pages/student/Notifications";
 import Support from "./pages/student/Support";
 import CourseMaterials from "./pages/student/CourseMaterials";
+import StudentPayments from "./pages/student/StudentPayments";
+import FeeSlipDetail from "./components/FeeSlipDetail";
+
 
 function App() {
   return (
@@ -51,7 +54,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Dashboard />} />
+          <Route index element={<StudentHome />} />
           <Route path="courses" element={<StudentCourses />} />
           <Route path="new-courses" element={<NewCourses />} />
           <Route path="progress" element={<Progress />} />
@@ -60,6 +63,8 @@ function App() {
           <Route path="notifications" element={<Notifications />} />
           <Route path="support" element={<Support />} />
           <Route path="courses/materials" element={<CourseMaterials />} />
+          <Route path="payments" element={<StudentPayments />} />
+          <Route path="fees/:feeId" element={<FeeSlipDetail />} />
         </Route>
 
         {/* Protected Teacher Routes */}

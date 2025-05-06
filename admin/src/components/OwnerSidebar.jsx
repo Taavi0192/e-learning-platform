@@ -3,12 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import {
     FiHome,
     FiBook,
-    FiCalendar,
     FiUsers,
-    FiAward,
-    FiSettings,
     FiLogOut,
-    FiMessageSquare,
     FiClipboard,
 } from "react-icons/fi";
 import AuthContext from "../context/AuthContext";
@@ -34,14 +30,10 @@ const Sidebar = ({ isSidebarOpen, navigate }) => {
             <div className="flex flex-col h-full py-4 px-3">
                 <nav className="space-y-1 px-2">
                     <SidebarLink to="/owner-dashboard" icon={<FiHome />} text="Dashboard" active={isActive("")} />
-                    {/*<SidebarLink to="/dashboard/courses" icon={<FiBook />} text="Course Management" active={isActive("/courses")} />*/}
-                    {/*<SidebarLink to="/dashboard/scheduling" icon={<FiCalendar />} text="Scheduling & Planning" active={isActive("/scheduling")} />*/}
-                    {/*<SidebarLink to="/dashboard/students" icon={<FiUsers />} text="Student Management" active={isActive("/students")} />*/}
-                    {/*<SidebarLink to="/dashboard/teachers" icon={<FiUsers />} text="Teacher Management" active={isActive("/teachers")} />*/}
-                    {/*<SidebarLink to="/dashboard/communications" icon={<FiMessageSquare />} text="Communications" active={isActive("/communications")} />*/}
-                    {/*<SidebarLink to="/dashboard/attendance" icon={<FiClipboard />} text="Attendance & Evaluations" active={isActive("/attendance")} />*/}
-                    {/*<SidebarLink to="/dashboard/certifications" icon={<FiAward />} text="Certifications" active={isActive("/certifications")} />*/}
-                    {/*<SidebarLink to="/dashboard/settings" icon={<FiSettings />} text="Settings" active={isActive("/settings")} />*/}
+
+                    <SidebarLink to="/owner-dashboard/revenue" icon={<FiUsers />} text="Revenue" active={isActive("/revenue")} />
+                    <SidebarLink to="/owner-dashboard/expenses" icon={<FiClipboard />} text="Expenses" active={isActive("/expenses")} />
+                    <SidebarLink to="/owner-dashboard/profit" icon={<FiBook />} text="Profit/Loss Report" active={isActive("/profit")} />
 
                     <div className="pt-4 mt-4 border-t border-[#A01717]">
                         <button

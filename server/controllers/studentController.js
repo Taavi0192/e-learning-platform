@@ -1,6 +1,8 @@
 import Student from "../models/studentModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import FineSecurity from "../models/FineSecurity.js";
+import Fee from "../models/Fee.js";
 
 // Generate Tokens
 const generateAccessToken = (user) => {
@@ -119,5 +121,64 @@ export const refreshAccessToken = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error });
+  }
+};
+
+// GET all fees
+export const getStudentFees = async (req, res) => {
+  try {
+    const fees = await Fee.find({ student: req.params.studentId });
+    res.json(fees);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// PATCH pay fee
+export const markFeeAsPaid = async (req, res) => {
+  try {
+    const fee = await Fee.findByIdAndUpdate(
+        req.params.feeId,
+        { status: "paid" },
+        { new: true }
+    );
+    res.json(fee);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// GET all fines
+export const getStudentFines = async (req, res) => {
+  try {
+    const fines = await FineSecurity.find({ studentId: req.params.studentId });
+    res.json(fines);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// PATCH pay fine
+export const markFineAsPaid = async (req, res) => {
+  try {
+    const fine = await FineSecurity.findByIdAndUpdate(
+        req.params.fineId,
+        { status: "paid" },
+        { new: true }
+    );
+    res.json(fine);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getFeeDetail = async (req, res) => {
+  try {
+    const fee = await Fee.findById(req.params.feeId);
+    if (!fee) return res.status(404).json({ message: "Fee not found." });
+    res.json(fee);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error." });
   }
 };

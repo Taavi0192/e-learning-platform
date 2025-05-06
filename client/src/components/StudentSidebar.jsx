@@ -8,7 +8,7 @@ import {
   FiAward,
   FiMessageSquare,
   FiLogOut,
-  FiPlusCircle,
+  FiPlusCircle, FiClipboard,
 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
@@ -47,6 +47,7 @@ const StudentSidebar = () => {
             <SidebarLink to="/student-dashboard/attendance" icon={<FiCalendar />} text="Attendance" active={isActive("/student-dashboard/attendance")} />
             <SidebarLink to="/student-dashboard/notifications" icon={<FiBell />} text="Notifications" active={isActive("/student-dashboard/notifications")} />
             <SidebarLink to="/student-dashboard/support" icon={<FiMessageSquare />} text="Support & Help" active={isActive("/student-dashboard/support")} />
+            <SidebarLink to="/student-dashboard/payments" icon={<FiClipboard />} text="Payments" active={isActive("/student-dashboard/payments")} />
 
             <div className="pt-4 mt-4 border-t border-[#A01717]">
               <button

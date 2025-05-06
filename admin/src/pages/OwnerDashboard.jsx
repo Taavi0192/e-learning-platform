@@ -8,9 +8,10 @@ import OwnerSidebar from "../components/OwnerSidebar";
 
 // Pages (create these or reuse similar ones)
 import Dashboard from "./owner/Dashboard";
-// import Reports from "./owner/Reports";
-// import Financials from "./owner/Financials";
-// import Settings from "./owner/Settings";
+import RevenueDetails from "./owner/RevenueDetails";
+import ExpensesDetails from "./owner/ExpensesDetails";
+import ProfitReport from "./owner/ProfitReport";
+
 
 const OwnerDashboard = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -40,9 +41,9 @@ const OwnerDashboard = () => {
                     <div className="py-6 px-4 sm:px-6 lg:px-8 text-[#A01717]">
                         <Routes>
                             <Route path="/" element={<Dashboard />} />
-                            {/*<Route path="/reports" element={<Reports />} />*/}
-                            {/*<Route path="/financials" element={<Financials />} />*/}
-                            {/*<Route path="/settings" element={<Settings />} />*/}
+                            <Route path="/revenue" element={<RevenueDetails />} />
+                            <Route path="/expenses" element={<ExpensesDetails />} />
+                            <Route path="/profit" element={<ProfitReport />} />
                         </Routes>
                     </div>
                 </main>

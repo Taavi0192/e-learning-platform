@@ -1,167 +1,213 @@
 import React from 'react';
-import { Bar } from 'react-chartjs-2';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Tooltip,
-    Legend
-} from 'chart.js';
+import { FiUsers, FiBookOpen, FiCalendar, FiBarChart2, FiCheckCircle, FiBell } from 'react-icons/fi';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
-
-const Dashboard = () => {
-    const dummyStats = {
-        capacity: 5704,
-        enrollment: 5152,
-        present: 5152,
-        absent: 552, // NEW!
-        presentRate: 100,
-        behavior: {
-            warnings: 125,
-            fines: 88,
-            expulsions: 12,
-        },
+const PrincipalDashboard = () => {
+    // Mock data (to be replaced by API)
+    const stats = {
+        totalStudents: 843,
+        totalTeachers: 47,
+        activeCourses: 26,
+        studentAttendance: '88%',
+        teacherAttendance: '96%',
+        certificatesIssued: 312,
     };
 
-    const attendanceChart = {
-        labels: ['Pre-K', 'KG', '01', '02', '03', '04', '05', '06', '07', '08'],
-        datasets: [
-            {
-                label: 'Present',
-                backgroundColor: '#16a34a',
-                data: [240, 300, 410, 390, 380, 360, 350, 335, 320, 310],
-            },
-            {
-                label: 'Absent',
-                backgroundColor: '#dc2626',
-                data: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-            },
-        ],
-    };
+    const recentResults = [
+        { id: 1, name: 'Maya Rodriguez', class: '10-A', score: '92%' },
+        { id: 2, name: 'John Chen', class: '9-B', score: '85%' },
+        { id: 3, name: 'Sarah Wilson', class: '11-C', score: '89%' },
+        { id: 4, name: 'Raj Patel', class: '12-A', score: '78%' },
+    ];
 
-    const absences = {
-        "2023-06-10": "green",
-        "2023-06-11": "yellow",
-        "2023-06-12": "red",
-        "2023-06-15": "yellow",
-        "2023-06-20": "red"
-    };
+    const classAverages = [
+        { id: 1, className: '10-A', average: '87%' },
+        { id: 2, className: '9-B', average: '82%' },
+        { id: 3, className: '11-C', average: '84%' },
+    ];
 
-    const daysInMonth = 30;
-    const today = new Date();
-    const currentMonth = today.toLocaleString('default', { month: 'long' });
-
-    const renderCalendar = () => {
-        const days = [];
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dateKey = `2023-06-${String(day).padStart(2, '0')}`;
-            const color = absences[dateKey];
-            let bgColor = 'bg-gray-100';
-            if (color === 'green') bgColor = 'bg-green-200';
-            else if (color === 'yellow') bgColor = 'bg-yellow-200';
-            else if (color === 'red') bgColor = 'bg-red-200';
-
-            days.push(
-                <div key={day} className={`text-center p-2 rounded ${bgColor}`}>
-                    {day}
-                </div>
-            );
-        }
-        return days;
-    };
+    const upcomingSchedule = [
+        { id: 1, course: 'React Fundamentals', instructor: 'Dr. Michael Lee', date: 'Today', time: '10:00 AM - 12:00 PM', location: 'Room 101' },
+        { id: 2, course: 'Advanced JavaScript', instructor: 'Sarah Johnson', date: 'Today', time: '2:00 PM - 4:00 PM', location: 'Online' },
+        { id: 3, course: 'UX/UI Design', instructor: 'Emma Thompson', date: 'Tomorrow', time: '9:00 AM - 11:00 AM', location: 'Design Lab' },
+    ];
 
     return (
-        <div className="p-6 bg-[#F8E8E8] min-h-screen space-y-10">
-            <h1 className="text-3xl font-bold text-[#A01717] mb-6">Campus Compass</h1>
-
-            {/* ✅ Finalized 6-Card Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                <KPI title="Capacity" value={dummyStats.capacity} />
-                <KPI title="Enrollment" value={dummyStats.enrollment} />
-                <KPI title="Present" value={dummyStats.present} />
-                <KPI title="Absents" value={dummyStats.absent} isWarning />
-                <KPI title="% Present" value={`${dummyStats.presentRate}%`} isSuccess />
+        <div>
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold text-gray-800">Principal Dashboard</h1>
             </div>
 
-            {/* Bar Chart + Behavior Stats side-by-side */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="col-span-2 bg-white p-6 rounded-xl shadow-sm">
-                    <h2 className="text-xl font-semibold text-[#A01717] mb-4">Attendance by Grade</h2>
-                    <Bar
-                        data={attendanceChart}
-                        options={{
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                    position: 'bottom',
-                                    labels: { color: '#374151' }
-                                },
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    max: 450,
-                                    ticks: { color: '#374151' }
-                                },
-                                x: {
-                                    ticks: { color: '#374151' }
-                                }
-                            },
-                        }}
-                    />
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-gray-500 text-sm font-medium mb-1">Total Students</p>
+                            <h3 className="text-3xl font-bold text-gray-800">{stats.totalStudents}</h3>
+                        </div>
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                            <FiUsers className="h-6 w-6 text-[#19a4db]" />
+                        </div>
+                    </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm">
-                    <h2 className="text-xl font-semibold text-[#A01717] mb-4">Behavior Overview</h2>
-                    <div className="space-y-4">
-                        <BehaviorStat label="Warnings" count={dummyStats.behavior.warnings} color="bg-yellow-100 text-yellow-800" />
-                        <BehaviorStat label="Fines" count={dummyStats.behavior.fines} color="bg-blue-100 text-blue-800" />
-                        <BehaviorStat label="Expulsions" count={dummyStats.behavior.expulsions} color="bg-red-100 text-red-800" />
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-gray-500 text-sm font-medium mb-1">Total Teachers</p>
+                            <h3 className="text-3xl font-bold text-gray-800">{stats.totalTeachers}</h3>
+                        </div>
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                            <FiUsers className="h-6 w-6 text-[#19a4db]" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-gray-500 text-sm font-medium mb-1">Active Courses</p>
+                            <h3 className="text-3xl font-bold text-gray-800">{stats.activeCourses}</h3>
+                        </div>
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                            <FiBookOpen className="h-6 w-6 text-[#19a4db]" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-gray-500 text-sm font-medium mb-1">Student Attendance Today</p>
+                            <h3 className="text-3xl font-bold text-gray-800">{stats.studentAttendance}</h3>
+                        </div>
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                            <FiCalendar className="h-6 w-6 text-[#19a4db]" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-gray-500 text-sm font-medium mb-1">Teacher Attendance Today</p>
+                            <h3 className="text-3xl font-bold text-gray-800">{stats.teacherAttendance}</h3>
+                        </div>
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                            <FiCalendar className="h-6 w-6 text-[#19a4db]" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-gray-500 text-sm font-medium mb-1">Certificates Issued</p>
+                            <h3 className="text-3xl font-bold text-gray-800">{stats.certificatesIssued}</h3>
+                        </div>
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                            <FiCheckCircle className="h-6 w-6 text-[#19a4db]" />
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Teacher Absence Calendar */}
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-                <h2 className="text-xl font-semibold text-[#A01717] mb-4">Teacher Absences This Month</h2>
-                <p className="text-sm text-gray-600 mb-2">{currentMonth} 2023</p>
-                <div className="grid grid-cols-7 gap-2">
-                    {renderCalendar()}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Recent Results */}
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h2 className="font-semibold text-lg text-gray-800">Recent Student Results</h2>
+                    </div>
+                    <div className="p-4">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead>
+                            <tr>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+                            </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                            {recentResults.map((result) => (
+                                <tr key={result.id}>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{result.name}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{result.class}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{result.score}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div className="mt-4 flex space-x-4 text-sm text-gray-700">
-                    <span className="flex items-center">
-                        <span className="w-4 h-4 rounded bg-green-200 mr-1"></span> 1-2 Absences
-                    </span>
-                    <span className="flex items-center">
-                        <span className="w-4 h-4 rounded bg-yellow-200 mr-1"></span> 3-4 Absences
-                    </span>
-                    <span className="flex items-center">
-                        <span className="w-4 h-4 rounded bg-red-200 mr-1"></span> 5+ Absences
-                    </span>
+
+                {/* Class Performance */}
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h2 className="font-semibold text-lg text-gray-800">Class Performance Averages</h2>
+                    </div>
+                    <div className="p-4">
+                        <ul className="space-y-3">
+                            {classAverages.map((cls) => (
+                                <li key={cls.id} className="flex justify-between items-center border-b pb-2 last:border-none">
+                                    <span className="text-sm text-gray-700">{cls.className}</span>
+                                    <span className="text-sm font-semibold text-gray-900">{cls.average}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
+
+                {/* Upcoming Schedule */}
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden lg:col-span-2">
+                    <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h2 className="font-semibold text-lg text-gray-800">Upcoming Schedule</h2>
+                    </div>
+                    <div className="p-4">
+                        <div className="space-y-4">
+                            {upcomingSchedule.map((schedule) => (
+                                <div key={schedule.id} className="border border-gray-100 rounded-lg p-4">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className="font-semibold text-gray-800">{schedule.course}</h3>
+                                            <p className="text-sm text-gray-600 mt-1">Instructor: {schedule.instructor}</p>
+                                            <p className="text-sm text-gray-500 mt-1">{schedule.location}</p>
+                                        </div>
+                                        <div className="bg-blue-50 text-[#19a4db] px-3 py-1 rounded-lg text-sm font-medium">
+                                            {schedule.time}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Notices Board */}
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden lg:col-span-2">
+                    <div className="px-6 py-4 border-b border-gray-100">
+                        <h2 className="font-semibold text-lg text-gray-800">Notices Board</h2>
+                    </div>
+                    <div className="p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="border-l-4 border-yellow-400 bg-yellow-50 p-4 rounded-r-lg">
+                                <h3 className="font-medium text-yellow-800">Maintenance</h3>
+                                <p className="text-sm text-yellow-700 mt-1">System maintenance scheduled for Sunday 2 AM.</p>
+                            </div>
+                            <div className="border-l-4 border-blue-400 bg-blue-50 p-4 rounded-r-lg">
+                                <h3 className="font-medium text-blue-800">Meeting</h3>
+                                <p className="text-sm text-blue-700 mt-1">Staff meeting this Friday at 3 PM in the conference hall.</p>
+                            </div>
+                            <div className="border-l-4 border-green-400 bg-green-50 p-4 rounded-r-lg">
+                                <h3 className="font-medium text-green-800">Event</h3>
+                                <p className="text-sm text-green-700 mt-1">Annual Sports Day scheduled for next month.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     );
 };
 
-const KPI = ({ title, value, isSuccess = false, isWarning = false, small = false }) => {
-    const color = isSuccess ? 'text-green-600' : isWarning ? 'text-yellow-600' : 'text-gray-800';
-    return (
-        <div className="bg-white p-4 rounded-lg shadow-sm flex flex-col justify-between">
-            <p className="text-gray-500 text-sm font-medium">{title}</p>
-            <h3 className={`text-2xl font-bold ${color}`}>{value}</h3>
-            {small && <p className="text-xs text-gray-400 mt-1">(breakdown shown)</p>}
-        </div>
-    );
-};
-
-const BehaviorStat = ({ label, count, color }) => (
-    <div className={`p-4 rounded-lg ${color} shadow-sm`}>
-        <p className="text-sm font-medium">{label}</p>
-        <h3 className="text-2xl font-bold">{count}</h3>
-    </div>
-);
-
-export default Dashboard;
+export default PrincipalDashboard;
