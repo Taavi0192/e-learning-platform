@@ -16,7 +16,7 @@ import path from "path";
 import assignmentRoutes from "./routes/assignmentRoutes.js";
 import staffSalaryRoutes from "./routes/staffSalaryRoutes.js";
 import fineRoutes from "./routes/fineRoutes.js";
-import expenseRoutes from "./routes/AccountantRoutes.js";
+import expenseRoutes from "./routes/accountantRoutes.js";
 import feeRoutes from "./routes/feeRoutes.js";
 
 const app = express();
