@@ -22,7 +22,7 @@ import feeRoutes from "./routes/feeRoutes.js";
 const app = express();
 
 // Middleware
-const allowedOrigins = ["http://localhost:3001", "http://localhost:3000", "https://e-learning-platform-2t6n.vercel.app/login", "https://e-learning-platform-azure.vercel.app/login"];
+const allowedOrigins = ["http://localhost:3001", "http://localhost:3000", "https://e-learning-platform-2t6n.vercel.app", "https://e-learning-platform-azure.vercel.app"];
 
 app.use(
   cors({
