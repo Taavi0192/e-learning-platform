@@ -3,7 +3,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 // ——— GLOBAL AXIOS CONFIG ———
-axios.defaults.baseURL = "http://localhost:5000";
+axios.defaults.baseURL = "https://e-learning-platform-zjs7.onrender.com";
 axios.defaults.withCredentials = true;
 
 // Attach Authorization header on every request if we have a token
