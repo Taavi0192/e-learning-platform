@@ -61,7 +61,7 @@ app.use(passport.session());
 app.use("/api/studentRoute", studentRoutes);
 app.use("/api/teacherRoutes", teacherRoutes);
 app.use("/api/adminRoutes", adminRoutes);
-app.use("/api/resetpassword", passwordReset);
+// app.use("/api/resetpassword", passwordReset);
 app.use("/api/googleAuth", googleAuthRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/assignments", assignmentRoutes);
